@@ -66,6 +66,43 @@ const LINES = {
   },
 }
 
+/**
+ * 「判不了」按**原因**分支（2026-11-01 用户反馈：所有 unknown 都说"我看不清"，看不出该做什么）。
+ * 原因 id 来自 `status-to-events.unknownReason()`；没给原因才用兜底那组。
+ * 每一组都遵守老纪律：不安慰、不猜、把"是谁的问题"说清楚（数据旧 / 台账坏 / 我读不到）。
+ */
+export const UNKNOWN_LINES = {
+  stale: [
+    '数据还是{age}的，门禁大概没跑。',
+    '我手上这堆是{age}的，早就不能当真了。',
+    '最后一次是{age}，之后没人喂我。',
+  ],
+  'no-ledger': [
+    '它还没跑过一次，我什么都不知道。',
+    '台账是空的，这不算好消息。',
+  ],
+  'bad-timestamp': [
+    '台账里有一行时间看不懂，我跳过了。',
+    '有一行记录的时间是坏的，判不了。',
+  ],
+  'bad-exit': [
+    '台账里有个没见过的退出码，我不敢当好事。',
+    '有行记录的退出码不认识，判不了。',
+  ],
+  'route-unreadable': [
+    '是我这边读不到，不是世界坏了。',
+    '桥断了，我暂时看不见。',
+  ],
+  'no-art': [
+    '素材没装上，我连自己都画不出来。',
+  ],
+  unknown: [
+    '我看不清，别信我瞎猜。',
+    '读不到状态，先别指望我。',
+    '这会儿判不了。',
+  ],
+}
+
 const PLAIN = {
   idle: '没有待办。',
   busy: '有任务在跑。',
@@ -89,6 +126,30 @@ function fill(template, clause) {
  * @param {'auto'|'plain'|'playful'} [input.tone]
  * @param {object} [input.facts] { tools, runningSessions, failingRuns, sustainedMs, approvalPending, night }
  */
+/**
+ * unknown 专用：按原因选句子，并把年龄塞进去（`{age}` 用 ageWords 的词，不塞裸时间戳）。
+ * @param {{reasonId?: string, ageMs?: number, seq?: number, persona?: string, tone?: string}} input
+ */
+export function unknownLine(input = {}) {
+  const reasonId = UNKNOWN_LINES[input.reasonId] ? input.reasonId : 'unknown'
+  if (input.tone === 'plain') return PLAIN.unknown
+  const lines = UNKNOWN_LINES[reasonId]
+  const seq = Math.abs(Math.trunc(Number(input.seq) || 0))
+  const template = lines[seq % lines.length]
+  const age = ageWordsLocal(Number(input.ageMs) || 0)
+  return template.replace(/\{age\}/g, age)
+}
+
+/** 本地实现，避免为了一个词表把 status-to-events 也拖进来（voice 只依赖纯文本） */
+function ageWordsLocal(ms) {
+  const min = Math.round(Math.max(0, ms) / 60_000)
+  if (min < 1) return '刚刚'
+  if (min < 60) return `${min} 分钟前`
+  const hours = Math.round(min / 60)
+  if (hours < 48) return `${hours} 小时前`
+  return `${Math.round(hours / 24)} 天前`
+}
+
 export function lineFor(input = {}, seqArg) {
   // 兼容旧签名 lineFor(state, seq)：老调用方（生成的 client 副本）传字符串时轮换仍生效。
   const arg = typeof input === 'string' ? { state: input, seq: seqArg } : input
@@ -97,6 +158,15 @@ export function lineFor(input = {}, seqArg) {
   const tone = TONES.includes(inputState.tone) ? inputState.tone : 'auto'
   // plain：只报事实，不带形象口吻（给"别演"的人）
   if (tone === 'plain') return PLAIN[state]
+  // unknown 且给了原因 ⇒ 用按原因分的句子（比"我看不清"有用得多）
+  if (state === 'unknown' && inputState.facts?.reasonId) {
+    return unknownLine({
+      reasonId: inputState.facts.reasonId,
+      ageMs: inputState.facts.ageMs,
+      seq: inputState.seq,
+      tone,
+    })
+  }
   const persona = LINES[inputState.persona] ? inputState.persona : 'mermaid-maid'
   const lines = LINES[persona][state]
   const seq = Math.abs(Math.trunc(Number(inputState.seq) || 0))

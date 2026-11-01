@@ -88,3 +88,29 @@ test('夜间窗口：23–7 跨零点，白天不算', () => {
   assert.equal(inNightWindow(at(14)), false)
   assert.equal(STALE_MS, 6 * 3600_000)
 })
+
+test('未知按原因分支：数据旧 / 台账空 / 我读不到，说法与下一步都不同', async () => {
+  const { unknownReason, ageWords } = await import('../src/status-to-events.mjs')
+  const { unknownLine } = await import('../src/pet-voice.mjs')
+  const stale = unknownLine({ reasonId: 'stale', ageMs: 12 * 3600_000, seq: 0 })
+  assert.match(stale, /12 小时前/)
+  assert.match(stale, /门禁/)
+  assert.match(unknownLine({ reasonId: 'no-ledger', seq: 0 }), /还没跑过/)
+  assert.match(unknownLine({ reasonId: 'route-unreadable', seq: 0 }), /读不到/)
+  assert.notEqual(stale, unknownLine({ reasonId: 'no-ledger', seq: 0 }))
+  // 原因映射必须来自 healthReason 的**实际取值**
+  assert.equal(unknownReason('stale(11.9h>6h)').id, 'stale')
+  assert.equal(unknownReason('no-ledger').id, 'no-ledger')
+  assert.equal(unknownReason('ledger-ok').id, 'unknown', 'ok 不是"判不了"的原因')
+  assert.equal(ageWords(90 * 60_000), '2 小时前')
+})
+
+test('过期阈值跟服务端的 ttlH 走（不再客户端硬编码 6h）', async () => {
+  const { isStale, staleMsFromTtl } = await import('../src/status-to-events.mjs')
+  const asOf = '2026-11-01T00:59:43Z'
+  const now = Date.parse('2026-11-01T12:50:00Z')       // 距今 ~11.8h
+  assert.equal(isStale(asOf, now, staleMsFromTtl(36)), false, '服务端说 36h 内有效，客户端不能再判它过期')
+  assert.equal(isStale(asOf, now, staleMsFromTtl(undefined)), true, '缺 ttlH 才回退 6h')
+  assert.equal(staleMsFromTtl(36) / 3600_000, 36)
+  assert.equal(staleMsFromTtl('bad') / 3600_000, 6, '非法值回退 6h')
+})

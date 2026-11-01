@@ -59,6 +59,43 @@ export function eventsFor(prev, next) {
  */
 export const STALE_MS = 6 * 3600_000
 
+/**
+ * 过期阈值**必须跟服务端一致**（2026-11-01 实际故障）：服务端 `pet-status` 的 `ttlH` 是 36 小时，
+ * 客户端却硬编码 6 小时 ⇒ 同一份数据在两边得到相反的结论：服务端说 `ok`，挂件说"数据太旧了"。
+ * 现在统一由 payload 的 `ttlH` 决定（缺省才回退 STALE_MS），并从 payload 里取。
+ */
+export function staleMsFromTtl(ttlH, fallbackMs = STALE_MS) {
+  const h = Number(ttlH)
+  return Number.isFinite(h) && h > 0 ? h * 3600_000 : fallbackMs
+}
+
+/** 把毫秒年龄说成人话（V1：新鲜度渲染成词，不渲染裸时间戳；也不要把 UTC 时钟当本地时间展示）。 */
+export function ageWords(ageMs) {
+  const ms = Math.max(0, Number(ageMs) || 0)
+  const min = Math.round(ms / 60_000)
+  if (min < 1) return '刚刚'
+  if (min < 60) return `${min} 分钟前`
+  const hours = Math.round(min / 60)
+  if (hours < 48) return `${hours} 小时前`
+  return `${Math.round(hours / 24)} 天前`
+}
+
+/**
+ * 「判不了」的原因 → 一句人话 + 下一步。原因来自服务端 `healthReason`，不是猜的。
+ * 为什么必须分开（2026-11-01 用户反馈）：所有 unknown 都只说"我看不清"，用户不知道
+ * 是"数据旧"、"从没跑过"、"台账坏了"还是"桥读不到" —— 而这四种该做的事完全不同。
+ */
+export function unknownReason(reason) {
+  const r = String(reason ?? '')
+  if (r.startsWith('stale(')) return { id: 'stale', hint: '门禁大概没跑，去看一眼' }
+  if (r === 'no-ledger') return { id: 'no-ledger', hint: '它还没跑过一次' }
+  if (r === 'bad-timestamp') return { id: 'bad-timestamp', hint: '台账里有一行时间看不懂' }
+  if (r.startsWith('bad-exit')) return { id: 'bad-exit', hint: '台账里有个没见过的退出码' }
+  if (r === 'route-read-failed') return { id: 'route-unreadable', hint: '是我这边读不到，不是世界坏了' }
+  if (r === 'missing-persona' || r === 'no-atlas') return { id: 'no-art', hint: '素材没装上' }
+  return { id: 'unknown', hint: '' }
+}
+
 export function isStale(asOf, now, staleMs = STALE_MS) {
   if (!asOf) return true
   const t = typeof asOf === 'number' ? asOf : Date.parse(String(asOf))
