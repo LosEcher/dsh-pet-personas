@@ -79,6 +79,30 @@ def op_breathe(base, band, offsets, out_dir, name):
     return frames, {"op": "breathe", "band": [y0, h], "offsets": offsets}
 
 
+def op_shift(base, box, offsets, out_dir, name):
+    """把 box 内的像素整体做整数位移；box 边缘的行/列用 box 内最近的一行/列填充。
+
+    关键：**取像素的范围严格限制在 box 内** ⇒ box 之外的像素逐字节不变（可机械验证）。
+    适合"有独立轮廓的部件"（笔记本电脑、手、Zz 符号、尾巴）；连续的大块（头发/头部）会拉出接缝。
+    """
+    x0, y0, x1, y1 = box
+    w, h = base.size
+    px = base.load()
+    frames = []
+    for i, (dx, dy) in enumerate(offsets):
+        img = base.copy()
+        dst = img.load()
+        for y in range(y0, y1 + 1):
+            sy = min(max(y - dy, y0), y1)          # 夹在 box 内：不从上/下界外取像素
+            for x in range(x0, x1 + 1):
+                sx = min(max(x - dx, x0), x1)
+                dst[x, y] = px[sx, sy]
+        path = os.path.join(out_dir, f"{name}_{i}.png")
+        img.save(path)
+        frames.append(path)
+    return frames, {"op": "shift", "box": list(box), "offsets": [list(o) for o in offsets]}
+
+
 def op_blink(open_img, closed_img, out_dir, name, ratio=0.5):
     """用两帧的差异包围盒造"半闭"帧：把包围盒下部 ratio 比例的像素取自闭眼帧。"""
     box = diff_bbox(open_img, closed_img)
@@ -107,7 +131,8 @@ def op_blink(open_img, closed_img, out_dir, name, ratio=0.5):
 
 def main(argv):
     ap = argparse.ArgumentParser(description="部件搬运补帧（整数位移/剪贴，不重采样）")
-    ap.add_argument("--op", required=True, choices=["breathe", "blink"])
+    ap.add_argument("--op", required=True, choices=["breathe", "blink", "shift"])
+    ap.add_argument("--box", default="", help="shift 的部件矩形 x0,y0,x1,y1")
     ap.add_argument("--base")
     ap.add_argument("--open")
     ap.add_argument("--closed")
@@ -119,7 +144,26 @@ def main(argv):
     args = ap.parse_args(argv)
 
     os.makedirs(args.out_dir, exist_ok=True)
-    if args.op == "breathe":
+    if args.op == "shift":
+        if not args.base or not args.box:
+            print("shift 需要 --base 与 --box x0,y0,x1,y1", file=sys.stderr)
+            return 2
+        box = tuple(int(v) for v in args.box.split(","))
+        if len(box) != 4:
+            print("--box 需要四个整数 x0,y0,x1,y1", file=sys.stderr)
+            return 2
+        pairs = []
+        for item in args.offsets.split(","):
+            item = item.strip()
+            if not item:
+                continue
+            if ":" in item:
+                dx, dy = item.split(":")
+                pairs.append((int(dx), int(dy)))
+            else:
+                pairs.append((0, int(item)))
+        frames, meta = op_shift(load(args.base), box, pairs, args.out_dir, args.name)
+    elif args.op == "breathe":
         if not args.base:
             print("breathe 需要 --base", file=sys.stderr)
             return 2

@@ -275,8 +275,10 @@ if (process.argv[1]?.endsWith('frame-gate.mjs')) {
     const limits = { cell: Number(arg('--cell', 96)) }
     if (argv.includes('--allow-identical')) limits.allowIdentical = true
     if (allowSpec) {
-      const [y0, y1] = allowSpec.split(':').map(Number)
-      limits.allowRegion = { y0, y1 }
+      const parts = allowSpec.split(/[:,]/).map(Number)
+      limits.allowRegion = parts.length === 4
+        ? { x0: parts[0], y0: parts[1], x1: parts[2], y1: parts[3] }
+        : { y0: parts[0], y1: parts[1] }
     }
     result = gateCandidate(readPng(basePath), readPng(candPath), limits)
   } catch (error) {
