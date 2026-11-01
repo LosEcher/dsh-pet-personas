@@ -105,7 +105,9 @@ def compute_grid(mode, mnp, boxes, rows, cols, right_cut):
         cgaps = empty_runs(mnp.sum(axis=0))
         cbands = content_bands(mnp, cgaps, W, 'col')
         if len(rbands) != rows or not cbands:
-            return None, 'gaps 模式没找到 %d 行（得到 %d）' % (rows, len(rbands))
+            # 调用方按三元组解包；这里少返回一个值会让失败路径变成 ValueError 崩栈，
+            # 真实的错误信息（"没找到 N 行"）反而看不到（2026-11-01 实测）。
+            return None, 'gaps 模式没找到 %d 行（得到 %d）' % (rows, len(rbands)), None
         if len(cbands) < cols:
             # 没有整列空带时，别用中点（装饰不对称会把一格切进别人身上）：
             # 在中间 40% 范围里找**列投影最小**的位置当分隔线。

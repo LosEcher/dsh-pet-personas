@@ -1,0 +1,13 @@
+{
+  "_comment": "把 pixel/frames/ 下做好的帧合进图集：frames 与 durations 必须一一对应。合成后跑 tools/compose-atlas.mjs，并同步 pixel/art/pet-cadence.json。",
+  "_blocked": "2026-11-01：whale-maid 的图集本身有缺陷（每格底部带一条相邻行的残片，见 pixel/frames/README.md），合过一次后 whale 的 sleep 节奏对不上、测试变红，已回退。whale 修好之前只合 mermaid，或者两个一起修好再合。",
+  "sleep": {
+    "frames": [
+      "pixel/frames/sleep-z/sleep_z_0.png",
+      "pixel/frames/sleep-z/sleep_z_1.png",
+      "pixel/frames/sleep-z/sleep_z_2.png",
+      "pixel/frames/sleep-z/sleep_z_3.png"
+    ],
+    "durations": [850, 850, 850, 850]
+  }
+}
