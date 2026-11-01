@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<title>pet persona demo</title>
+<link rel="stylesheet" href="persona.css">
+<style>
+  body { font: 14px/1.6 -apple-system, "PingFang SC", system-ui, sans-serif; margin: 24px; color: #222; }
+  .stage { display: flex; gap: 28px; align-items: flex-end; flex-wrap: wrap; margin: 16px 0 24px; }
+  .cell { text-align: center; }
+  .cell .av { cursor: pointer; }
+  .cell b { display: block; font-size: 12px; font-weight: 500; opacity: .7; margin-top: 4px; }
+  .panel { border: 1px solid #ddd; border-radius: 10px; padding: 12px 14px; max-width: 760px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 6px 0; }
+  label { font-size: 13px; }
+  code { background: #f4f4f4; padding: 1px 5px; border-radius: 4px; }
+  #bubble { min-height: 22px; color: #444; }
+  #classes { font: 12px/1.5 ui-monospace, Menlo, monospace; color: #666; word-break: break-all; }
+</style></head>
+<body>
+<h3>宠物形象 demo（4 个形象 × 4 种表情 × 三态事实）</h3>
+<p>这个页面只演示 <code>avatar-state.mjs</code> 的映射结果；事实仍应由 <code>/os-seams/pet-status</code> 提供。
+点形象＝交互反馈（<b>不改变</b> health 判定）；勾 reduced-motion 可看动画是否停下。</p>
+
+<div class="stage" id="stage"></div>
+
+<div class="panel">
+  <div class="row">
+    <label>health
+      <select id="health"><option>ok</option><option>attention</option><option selected>unknown</option></select>
+    </label>
+    <label>activity
+      <select id="activity"><option>busy</option><option selected>idle</option><option>unknown</option></select>
+    </label>
+    <label>approval
+      <select id="approval"><option selected>none</option><option>pending</option><option>unknown</option></select>
+    </label>
+    <label><input type="checkbox" id="reduce"> reduced-motion</label>
+    <label><input type="checkbox" id="typing"> 正在输入</label>
+  </div>
+  <div class="row"><span id="bubble"></span></div>
+  <div id="classes"></div>
+</div>
+
+<script type="module">
+import { deriveAvatar } from './avatar-state.mjs'
+
+const PERSONA_LABEL = {
+  cat: '猫猫', dog: '狗狗', clip: '回形针', lion: '小狮子', chibi: 'Q 版助手',
+  'whale-maid': '鲸尾女仆', 'gpt-maid': '独角白', 'gemini-maid': '星星紫', 'glm-maid': '黑白',
+  'claude-maid': '向日葵', 'qwen-maid': '执扇', 'grok-maid': '小恶魔',
+}
+const svgs = {}
+for (const p of Object.keys(PERSONA_LABEL)) {
+  svgs[p] = await fetch(`personas/${p}.svg`).then(r => r.text())
+}
+
+const stage = document.getElementById('stage')
+const els = {}
+for (const p of Object.keys(PERSONA_LABEL)) {
+  const cell = document.createElement('div'); cell.className = 'cell'
+  const wrap = document.createElement('div')
+  wrap.innerHTML = svgs[p]
+  wrap.className = 'av'
+  wrap.dataset.persona = p
+  const name = document.createElement('b'); name.textContent = PERSONA_LABEL[p]
+  cell.append(wrap, name); stage.append(cell)
+  els[p] = wrap
+}
+
+const $ = (id) => document.getElementById(id)
+function render() {
+  const status = { health: $('health').value, activity: $('activity').value, approval: $('approval').value }
+  const reduceMotion = $('reduce').checked
+  const typing = $('typing').checked
+  let lastClasses = ''
+  for (const [p, el] of Object.entries(els)) {
+    const pose = deriveAvatar(status, { persona: p, reduceMotion, typing })
+    el.className = ['av', ...pose.classes].join(' ')
+    el.setAttribute('data-health', pose.health)
+    el.setAttribute('aria-label', `${PERSONA_LABEL[p]}：${pose.health}/${pose.body}/${pose.approval}`)
+    lastClasses = pose.classes.join(' ')
+  }
+  $('classes').textContent = lastClasses
+  $('bubble').textContent = `喵/汪/…（气泡由交互产生，事实措辞来自 pet-status 的 display.text）`
+}
+for (const id of ['health','activity','approval','reduce','typing']) $(id).addEventListener('change', render)
+for (const [p, el] of Object.entries(els)) {
+  el.addEventListener('click', () => {
+    const status = { health: $('health').value, activity: $('activity').value, approval: $('approval').value }
+    const pose = deriveAvatar(status, { persona: p, click: true })
+    $('bubble').textContent = `${PERSONA_LABEL[p]}：${pose.bubble}（face=${pose.face}，health 仍是 ${pose.health}）`
+  })
+}
+render()
+window.__petDemo = { els, render }
+</script>
+</body></html>

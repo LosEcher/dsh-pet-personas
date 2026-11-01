@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="回形针助手">
+  <!-- 自绘"回形针"形象：**不**复刻任何厂商吉祥物的具体造型/名称，只用"纸夹"这一通用物。 -->
+  <g class="av-shadow"><ellipse cx="60" cy="108" rx="18" ry="4" opacity=".18"/></g>
+  <g class="av-body">
+    <path d="M46 96V40c0-13 9-22 14-22s14 9 14 22v50c0 9-6 15-14 15s-14-6-14-15V48"
+          fill="none" stroke="#9aa4b2" stroke-width="9" stroke-linecap="round"/>
+    <path d="M46 96V40c0-13 9-22 14-22s14 9 14 22v50c0 9-6 15-14 15s-14-6-14-15V48"
+          fill="none" stroke="#cfd6e0" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <g class="av-head">
+    <g class="av-expr av-expr-happy"><circle cx="54" cy="52" r="4.6" fill="#2b2b2b"/><circle cx="66" cy="52" r="4.6" fill="#2b2b2b"/><path d="M53 64q7 6 14 0" stroke="#2b2b2b" stroke-width="2.2" fill="none" stroke-linecap="round"/></g>
+    <g class="av-expr av-expr-worry"><circle cx="54" cy="52" r="4" fill="#2b2b2b"/><circle cx="66" cy="52" r="4" fill="#2b2b2b"/><path d="M48 44l8 3M72 44l-8 3" stroke="#2b2b2b" stroke-width="1.8" stroke-linecap="round"/><path d="M54 66q6-4 12 0" stroke="#2b2b2b" stroke-width="2" fill="none" stroke-linecap="round"/></g>
+    <g class="av-expr av-expr-confused"><circle cx="54" cy="52" r="4" fill="#2b2b2b"/><circle cx="66" cy="52" r="4" fill="#2b2b2b"/><path d="M54 65h12" stroke="#2b2b2b" stroke-width="2.2" stroke-linecap="round"/><text x="82" y="34" font-size="13" fill="#8a8a8a">?</text></g>
+    <g class="av-expr av-expr-focused"><path d="M48 51h9M63 51h9" stroke="#2b2b2b" stroke-width="2.4" stroke-linecap="round"/><circle cx="54" cy="55" r="3" fill="#2b2b2b"/><circle cx="66" cy="55" r="3" fill="#2b2b2b"/><path d="M54 66h12" stroke="#2b2b2b" stroke-width="2" stroke-linecap="round"/></g>
+  </g>
+  <g class="av-mark" aria-hidden="true"><circle cx="92" cy="26" r="9" fill="#e0453a"/><text x="92" y="31" font-size="12" text-anchor="middle" fill="#fff">!</text></g>
+</svg>

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="猫猫助手">
+  <!-- 猫：圆头 + 三角耳 + 尾巴。所有部件只靠外层 class 切换，SVG 本身不含逻辑。 -->
+  <g class="av-shadow"><ellipse cx="60" cy="108" rx="26" ry="5" opacity=".18"/></g>
+  <g class="av-tail"><path d="M92 92c10-2 16-10 15-19" stroke="currentColor" stroke-width="6" fill="none" stroke-linecap="round"/></g>
+  <g class="av-body">
+    <ellipse cx="60" cy="86" rx="26" ry="22" fill="#f6d9b6"/>
+    <ellipse cx="60" cy="90" rx="16" ry="13" fill="#fdf0dd"/>
+    <g class="av-paws"><ellipse cx="48" cy="102" rx="7" ry="5" fill="#f6d9b6"/><ellipse cx="72" cy="102" rx="7" ry="5" fill="#f6d9b6"/></g>
+  </g>
+  <g class="av-head">
+    <path d="M32 42 36 22 52 34Z" fill="#f0c99f"/><path d="M88 42 84 22 68 34Z" fill="#f0c99f"/>
+    <path d="M37 39 39 28 47 35Z" fill="#f7b8b8"/><path d="M83 39 81 28 73 35Z" fill="#f7b8b8"/>
+    <circle cx="60" cy="52" r="30" fill="#f6d9b6"/>
+    <g class="av-whiskers" stroke="#c9a889" stroke-width="1.6" stroke-linecap="round">
+      <path d="M30 52h-10M30 58h-9"/><path d="M90 52h10M90 58h9"/>
+    </g>
+    <g class="av-expr av-expr-happy"><circle cx="50" cy="50" r="3.4" fill="#2b2b2b"/><circle cx="70" cy="50" r="3.4" fill="#2b2b2b"/><path d="M54 60q6 5 12 0" stroke="#2b2b2b" stroke-width="2.2" fill="none" stroke-linecap="round"/></g>
+    <g class="av-expr av-expr-worry"><circle cx="50" cy="50" r="3" fill="#2b2b2b"/><circle cx="70" cy="50" r="3" fill="#2b2b2b"/><path d="M46 43l7 3M74 43l-7 3" stroke="#2b2b2b" stroke-width="1.8" stroke-linecap="round"/><path d="M55 62q5-4 10 0" stroke="#2b2b2b" stroke-width="2.2" fill="none" stroke-linecap="round"/></g>
+    <g class="av-expr av-expr-confused"><circle cx="50" cy="50" r="3" fill="#2b2b2b"/><circle cx="70" cy="50" r="3" fill="#2b2b2b"/><path d="M56 61h8" stroke="#2b2b2b" stroke-width="2.2" stroke-linecap="round"/><text x="86" y="36" font-size="13" fill="#8a8a8a">?</text></g>
+    <g class="av-expr av-expr-focused"><path d="M46 49h8M66 49h8" stroke="#2b2b2b" stroke-width="2.4" stroke-linecap="round"/><circle cx="50" cy="53" r="2.6" fill="#2b2b2b"/><circle cx="70" cy="53" r="2.6" fill="#2b2b2b"/><path d="M56 61h8" stroke="#2b2b2b" stroke-width="2" stroke-linecap="round"/></g>
+  </g>
+  <g class="av-mark" aria-hidden="true"><circle cx="92" cy="26" r="9" fill="#e0453a"/><text x="92" y="31" font-size="12" text-anchor="middle" fill="#fff">!</text></g>
+</svg>

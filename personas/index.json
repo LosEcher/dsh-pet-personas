@@ -1,0 +1,528 @@
+{
+ "schema": 1,
+ "personas": [
+  {
+   "id": "cat",
+   "label": {
+    "zh": "猫猫",
+    "en": "Cat"
+   },
+   "renderer": "svg",
+   "asset": "personas/cat.svg",
+   "viewBox": [
+    0,
+    0,
+    120,
+    120
+   ],
+   "parts": [
+    "head",
+    "body",
+    "tail",
+    "paws"
+   ],
+   "faces": [
+    "happy",
+    "worry",
+    "confused",
+    "focused"
+   ],
+   "marks": [
+    "exclaim"
+   ],
+   "motion": {
+    "busy": "bob-fast",
+    "idle": "bob-slow",
+    "none": "none"
+   },
+   "voice": {
+    "zh": {
+     "happy": "喵~",
+     "worry": "喵？",
+     "confused": "喵？？"
+    }
+   },
+   "ipNote": "自绘通用动物；非任何厂商吉祥物"
+  },
+  {
+   "id": "dog",
+   "label": {
+    "zh": "狗狗",
+    "en": "Dog"
+   },
+   "renderer": "svg",
+   "asset": "personas/dog.svg",
+   "viewBox": [
+    0,
+    0,
+    120,
+    120
+   ],
+   "parts": [
+    "head",
+    "body",
+    "tail"
+   ],
+   "faces": [
+    "happy",
+    "worry",
+    "confused",
+    "focused"
+   ],
+   "marks": [
+    "exclaim"
+   ],
+   "motion": {
+    "busy": "bob-fast",
+    "idle": "bob-slow",
+    "none": "none"
+   },
+   "voice": {
+    "zh": {
+     "happy": "汪！",
+     "worry": "呜？",
+     "confused": "汪？？"
+    }
+   },
+   "ipNote": "自绘通用动物；非任何厂商吉祥物"
+  },
+  {
+   "id": "clip",
+   "label": {
+    "zh": "回形针",
+    "en": "Paperclip"
+   },
+   "renderer": "svg",
+   "asset": "personas/clip.svg",
+   "viewBox": [
+    0,
+    0,
+    120,
+    120
+   ],
+   "parts": [
+    "head",
+    "body"
+   ],
+   "faces": [
+    "happy",
+    "worry",
+    "confused",
+    "focused"
+   ],
+   "marks": [
+    "exclaim"
+   ],
+   "motion": {
+    "busy": "bob-fast",
+    "idle": "bob-slow",
+    "none": "none"
+   },
+   "voice": {
+    "zh": {
+     "happy": "需要帮忙吗？",
+     "worry": "这好像有点问题。",
+     "confused": "我看看…看得不太清。"
+    }
+   },
+   "ipNote": "通用纸夹造型；不复刻任何办公助手吉祥物的具体形象与名称"
+  },
+  {
+   "id": "lion",
+   "label": {
+    "zh": "小狮子",
+    "en": "Lion cub"
+   },
+   "renderer": "svg",
+   "asset": "personas/lion.svg",
+   "viewBox": [
+    0,
+    0,
+    120,
+    120
+   ],
+   "parts": [
+    "head",
+    "body",
+    "tail",
+    "mane"
+   ],
+   "faces": [
+    "happy",
+    "worry",
+    "confused",
+    "focused"
+   ],
+   "marks": [
+    "exclaim"
+   ],
+   "motion": {
+    "busy": "bob-fast",
+    "idle": "bob-slow",
+    "none": "none"
+   },
+   "voice": {
+    "zh": {
+     "happy": "交给我！",
+     "worry": "有情况？",
+     "confused": "没看明白。"
+    }
+   },
+   "ipNote": "自绘通用动物；不复刻任何杀毒软件吉祥物的造型"
+  },
+  {
+   "id": "chibi",
+   "label": {
+    "zh": "Q 版助手",
+    "en": "Chibi assistant"
+   },
+   "renderer": "svg",
+   "asset": "personas/chibi.svg",
+   "viewBox": [
+    0,
+    0,
+    120,
+    120
+   ],
+   "parts": [
+    "hair-back",
+    "body",
+    "arms",
+    "head",
+    "hair-front"
+   ],
+   "faces": [
+    "happy",
+    "worry",
+    "confused",
+    "focused"
+   ],
+   "marks": [
+    "exclaim"
+   ],
+   "motion": {
+    "busy": "bob-fast",
+    "idle": "bob-slow",
+    "none": "none"
+   },
+   "voice": {
+    "zh": {
+     "happy": "我在。",
+     "worry": "这个要看一下。",
+     "confused": "我看不清。"
+    }
+   },
+   "ipNote": "自绘通用 Q 版人形；非任何厂商角色"
+  },
+  {
+   "id": "whale-maid",
+   "label": {
+    "zh": "鲸尾女仆",
+    "en": "Whale maid"
+   },
+   "renderer": "svg",
+   "asset": "personas/whale-maid.svg",
+   "viewBox": [
+    0,
+    0,
+    120,
+    120
+   ],
+   "parts": [
+    "tail",
+    "hair-back",
+    "body",
+    "arms",
+    "head",
+    "hair-front"
+   ],
+   "faces": [
+    "happy",
+    "worry",
+    "confused",
+    "focused"
+   ],
+   "marks": [
+    "exclaim"
+   ],
+   "motion": {
+    "busy": "bob-fast",
+    "idle": "bob-slow",
+    "none": "none"
+   },
+   "voice": {
+    "zh": {
+     "happy": "我在这儿。",
+     "worry": "这个不太对。",
+     "confused": "看不太清…"
+    }
+   },
+   "ipNote": "AI 生成设定形象（用户确认可自由使用）；本 SVG 为按特征自绘，非第三方角色复刻"
+  },
+  {
+   "id": "gpt-maid",
+   "label": {
+    "zh": "独角白女仆",
+    "en": "Unicorn white maid"
+   },
+   "renderer": "svg",
+   "asset": "personas/gpt-maid.svg",
+   "viewBox": [
+    0,
+    0,
+    120,
+    120
+   ],
+   "parts": [
+    "hair-back",
+    "body",
+    "arms",
+    "head",
+    "hair-front"
+   ],
+   "faces": [
+    "happy",
+    "worry",
+    "confused",
+    "focused"
+   ],
+   "marks": [
+    "exclaim"
+   ],
+   "motion": {
+    "busy": "bob-fast",
+    "idle": "bob-slow",
+    "none": "none"
+   },
+   "voice": {
+    "zh": {
+     "happy": "需要我做什么？",
+     "worry": "这一步有风险。",
+     "confused": "信息不足。"
+    }
+   },
+   "ipNote": "AI 生成设定形象（用户确认可自由使用）；本 SVG 为按特征自绘，非第三方角色复刻"
+  },
+  {
+   "id": "gemini-maid",
+   "label": {
+    "zh": "星星紫女仆",
+    "en": "Star purple maid"
+   },
+   "renderer": "svg",
+   "asset": "personas/gemini-maid.svg",
+   "viewBox": [
+    0,
+    0,
+    120,
+    120
+   ],
+   "parts": [
+    "hair-back",
+    "body",
+    "arms",
+    "head",
+    "hair-front"
+   ],
+   "faces": [
+    "happy",
+    "worry",
+    "confused",
+    "focused"
+   ],
+   "marks": [
+    "exclaim"
+   ],
+   "motion": {
+    "busy": "bob-fast",
+    "idle": "bob-slow",
+    "none": "none"
+   },
+   "voice": {
+    "zh": {
+     "happy": "一起看看？",
+     "worry": "这里好像不一致。",
+     "confused": "有两个说法。"
+    }
+   },
+   "ipNote": "AI 生成设定形象（用户确认可自由使用）；本 SVG 为按特征自绘，非第三方角色复刻"
+  },
+  {
+   "id": "glm-maid",
+   "label": {
+    "zh": "黑白女仆",
+    "en": "Monochrome maid"
+   },
+   "renderer": "svg",
+   "asset": "personas/glm-maid.svg",
+   "viewBox": [
+    0,
+    0,
+    120,
+    120
+   ],
+   "parts": [
+    "hair-back",
+    "body",
+    "arms",
+    "head",
+    "hair-front"
+   ],
+   "faces": [
+    "happy",
+    "worry",
+    "confused",
+    "focused"
+   ],
+   "marks": [
+    "exclaim"
+   ],
+   "motion": {
+    "busy": "bob-fast",
+    "idle": "bob-slow",
+    "none": "none"
+   },
+   "voice": {
+    "zh": {
+     "happy": "按流程来。",
+     "worry": "缺少前置条件。",
+     "confused": "规则没写清。"
+    }
+   },
+   "ipNote": "AI 生成设定形象（用户确认可自由使用）；本 SVG 为按特征自绘，非第三方角色复刻"
+  },
+  {
+   "id": "claude-maid",
+   "label": {
+    "zh": "向日葵女仆",
+    "en": "Sunflower maid"
+   },
+   "renderer": "svg",
+   "asset": "personas/claude-maid.svg",
+   "viewBox": [
+    0,
+    0,
+    120,
+    120
+   ],
+   "parts": [
+    "hair-back",
+    "body",
+    "arms",
+    "head",
+    "hair-front"
+   ],
+   "faces": [
+    "happy",
+    "worry",
+    "confused",
+    "focused"
+   ],
+   "marks": [
+    "exclaim"
+   ],
+   "motion": {
+    "busy": "bob-fast",
+    "idle": "bob-slow",
+    "none": "none"
+   },
+   "voice": {
+    "zh": {
+     "happy": "我来梳理一下。",
+     "worry": "这个结论要再确认。",
+     "confused": "上下文不够。"
+    }
+   },
+   "ipNote": "AI 生成设定形象（用户确认可自由使用）；本 SVG 为按特征自绘，非第三方角色复刻"
+  },
+  {
+   "id": "qwen-maid",
+   "label": {
+    "zh": "执扇女仆",
+    "en": "Fan maid"
+   },
+   "renderer": "svg",
+   "asset": "personas/qwen-maid.svg",
+   "viewBox": [
+    0,
+    0,
+    120,
+    120
+   ],
+   "parts": [
+    "hair-back",
+    "body",
+    "arms",
+    "prop",
+    "head",
+    "hair-front"
+   ],
+   "faces": [
+    "happy",
+    "worry",
+    "confused",
+    "focused"
+   ],
+   "marks": [
+    "exclaim"
+   ],
+   "motion": {
+    "busy": "bob-fast",
+    "idle": "bob-slow",
+    "none": "none"
+   },
+   "voice": {
+    "zh": {
+     "happy": "收到。",
+     "worry": "这条要复核。",
+     "confused": "还差一点信息。"
+    }
+   },
+   "ipNote": "AI 生成设定形象（用户确认可自由使用）；本 SVG 为按特征自绘，非第三方角色复刻"
+  },
+  {
+   "id": "grok-maid",
+   "label": {
+    "zh": "小恶魔女仆",
+    "en": "Imp maid"
+   },
+   "renderer": "svg",
+   "asset": "personas/grok-maid.svg",
+   "viewBox": [
+    0,
+    0,
+    120,
+    120
+   ],
+   "parts": [
+    "hair-back",
+    "body",
+    "arms",
+    "head",
+    "hair-front"
+   ],
+   "faces": [
+    "happy",
+    "worry",
+    "confused",
+    "focused"
+   ],
+   "marks": [
+    "exclaim"
+   ],
+   "motion": {
+    "busy": "bob-fast",
+    "idle": "bob-slow",
+    "none": "none"
+   },
+   "voice": {
+    "zh": {
+     "happy": "有意思。",
+     "worry": "这不太妙。",
+     "confused": "嗯？"
+    }
+   },
+   "ipNote": "AI 生成设定形象（用户确认可自由使用）；本 SVG 为按特征自绘，非第三方角色复刻"
+  }
+ ]
+}

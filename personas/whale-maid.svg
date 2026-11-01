@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="鲸尾女仆（自绘 Q 版助手）">
+  <!-- 复现参考图要点：蓝发+鲸尾+女仆头饰/围裙+短身 Q 版。全部自绘，无外链、无厂商标识。
+       分层：tail / hair-back / body / arms / head / hair-front(+head-dress) / 表情组。
+       设计约束见 ../PET-PERSONA-DESIGN-2026-11-01.md §3：发丝飘动等软体效果不做，只做骨架+表情。 -->
+  <g class="av-shadow"><ellipse cx="60" cy="114" rx="21" ry="4.2" opacity=".2"/></g>
+
+  <!-- 鲸尾（右侧） -->
+  <g class="av-tail">
+    <path d="M92 100c9-3 14-11 13-20 6 4 9 11 7 17 4-1 7-4 9-8 2 12-7 22-19 22-6 0-10-4-10-11Z" fill="#4a6fa5"/>
+    <path d="M93 98c6-3 9-9 9-15 4 3 6 8 5 12" fill="none" stroke="#3b5b8a" stroke-width="1.6" opacity=".7"/>
+  </g>
+
+  <!-- 头发（后层，大面积波浪） -->
+  <g class="av-hair-back">
+    <path d="M20 62c0-25 18-40 40-40s40 15 40 40c0 20-4 30-10 38-6 8-11 2-8-4 3-7 4-16 2-22-3-9-11-14-24-14s-21 5-24 14c-2 6-1 15 2 22 3 6-2 12-8 4-6-8-10-18-10-38Z" fill="#4a6fa5"/>
+    <path d="M26 78c-3 12-1 20 3 26 3 5-3 8-6 2-3-7-4-18-1-30Z" fill="#3b5b8a"/>
+    <path d="M94 78c3 12 1 20-3 26-3 5 3 8 6 2 3-7 4-18 1-30Z" fill="#3b5b8a"/>
+  </g>
+
+  <!-- 身体：深蓝连衣裙 + 白围裙 + 领结 -->
+  <g class="av-body">
+    <path d="M42 88h36l6 22H36Z" fill="#2f3f5c"/>
+    <path d="M50 88h20l3 22H47Z" fill="#f7f4ee"/>
+    <path d="M60 88v22" stroke="#dfd8cc" stroke-width="1"/>
+    <circle cx="60" cy="92" r="1.3" fill="#2f3f5c"/><circle cx="60" cy="99" r="1.3" fill="#2f3f5c"/>
+    <path d="M55 84l5 4 5-4-5-2Z" fill="#3b5b8a"/>
+    <rect x="54" y="78" width="12" height="8" rx="3" fill="#f7dcc4"/>
+  </g>
+
+  <!-- 手臂（短袖 + 白袖口） -->
+  <g class="av-arms">
+    <path d="M42 92c-5 5-6 10-5 14" stroke="#2f3f5c" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <path d="M78 92c5 5 6 10 5 14" stroke="#2f3f5c" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <circle cx="37" cy="108" r="3.6" fill="#f7f4ee"/><circle cx="83" cy="108" r="3.6" fill="#f7f4ee"/>
+  </g>
+
+  <!-- 头 -->
+  <g class="av-head">
+    <circle cx="60" cy="54" r="25" fill="#f7dcc4"/>
+    <!-- 鲸鳍耳 -->
+    <path d="M36 40c-7-4-13-3-16 2 5 4 11 5 16 3Z" fill="#4a6fa5"/>
+    <path d="M84 40c7-4 13-3 16 2-5 4-11 5-16 3Z" fill="#4a6fa5"/>
+    <!-- 腮红 + 胡须点 -->
+    <ellipse cx="44" cy="63" rx="4" ry="2.2" fill="#f2a7a7" opacity=".5"/>
+    <ellipse cx="76" cy="63" rx="4" ry="2.2" fill="#f2a7a7" opacity=".5"/>
+    <g stroke="#c9a889" stroke-width="1.2" stroke-linecap="round" opacity=".8">
+      <path d="M33 58h-7M33 62h-6"/><path d="M87 58h7M87 62h6"/>
+    </g>
+
+    <!-- 表情组 -->
+    <g class="av-expr av-expr-happy">
+      <ellipse cx="50" cy="55" rx="6.4" ry="8" fill="#fff"/><ellipse cx="70" cy="55" rx="6.4" ry="8" fill="#fff"/>
+      <circle cx="50" cy="56" r="4.8" fill="#3b5b8a"/><circle cx="70" cy="56" r="4.8" fill="#3b5b8a"/>
+      <circle cx="48.2" cy="53.5" r="1.6" fill="#fff"/><circle cx="68.2" cy="53.5" r="1.6" fill="#fff"/>
+      <path d="M55 67q5 4 10 0" stroke="#8a5b46" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </g>
+    <g class="av-expr av-expr-worry">
+      <ellipse cx="50" cy="56" rx="6" ry="7.2" fill="#fff"/><ellipse cx="70" cy="56" rx="6" ry="7.2" fill="#fff"/>
+      <circle cx="50" cy="57" r="4.2" fill="#3b5b8a"/><circle cx="70" cy="57" r="4.2" fill="#3b5b8a"/>
+      <path d="M43 46l8 3M77 46l-8 3" stroke="#3b5b8a" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M56 69q4-3 8 0" stroke="#8a5b46" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </g>
+    <g class="av-expr av-expr-confused">
+      <ellipse cx="50" cy="55" rx="6" ry="7.4" fill="#fff"/><ellipse cx="70" cy="55" rx="6" ry="7.4" fill="#fff"/>
+      <circle cx="50" cy="56" r="4.2" fill="#3b5b8a"/><circle cx="70" cy="56" r="4.2" fill="#3b5b8a"/>
+      <path d="M55 68h10" stroke="#8a5b46" stroke-width="2" stroke-linecap="round"/>
+      <text x="90" y="36" font-size="14" fill="#8a8a8a">?</text>
+    </g>
+    <g class="av-expr av-expr-focused">
+      <path d="M43 53h9M67 53h9" stroke="#3b5b8a" stroke-width="2.4" stroke-linecap="round"/>
+      <circle cx="50" cy="57" r="3.4" fill="#3b5b8a"/><circle cx="70" cy="57" r="3.4" fill="#3b5b8a"/>
+      <path d="M55 68h10" stroke="#8a5b46" stroke-width="2" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <!-- 头发（前层）：刘海 + 侧发 + 白色女仆头饰 + 蝴蝶结 -->
+  <g class="av-hair-front">
+    <path d="M34 50c1-15 13-24 26-24s25 9 26 24c-6-7-12-9-17-7-6-7-16-9-24-5-5 3-9 7-11 12Z" fill="#4a6fa5"/>
+    <path d="M35 46c-2 10-1 18 2 24 3 5-3 8-6 3-3-7-3-19 4-27Z" fill="#3b5b8a"/>
+    <path d="M85 46c2 10 1 18-2 24-3 5 3 8 6 3 3-7 3-19-4-27Z" fill="#3b5b8a"/>
+    <!-- 白色褶边头饰 -->
+    <path d="M38 34c6-8 14-12 22-12s16 4 22 12c3 4-1 7-4 4-4-5-11-8-18-8s-14 3-18 8c-3 3-7 0-4-4Z" fill="#fbf9f4"/>
+    <g fill="#efe9df"><circle cx="44" cy="31" r="2.4"/><circle cx="54" cy="27" r="2.4"/><circle cx="66" cy="27" r="2.4"/><circle cx="76" cy="31" r="2.4"/></g>
+    <!-- 侧边蝴蝶结 -->
+    <path d="M86 44c5-4 10-4 12 0-3 4-8 5-12 2Z" fill="#7ea6d8"/>
+    <path d="M98 44c-2 5-6 7-9 6 1-4 4-7 9-6Z" fill="#6b93c4"/>
+    <circle cx="88" cy="45" r="2.2" fill="#5d84b4"/>
+  </g>
+
+  <g class="av-mark" aria-hidden="true"><circle cx="96" cy="24" r="9" fill="#e0453a"/><text x="96" y="29" font-size="12" text-anchor="middle" fill="#fff">!</text></g>
+</svg>

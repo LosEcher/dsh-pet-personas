@@ -1,0 +1,37 @@
+/* 形象渲染的公共样式：只认 .av-* 类，不认具体形象。
+   规则：一次只显示一个 .av-expr-*；.av-mark 仅在 .av-mark-exclaim 下显示；
+        reduced-motion 下所有位移动画停止（保留表情切换）。 */
+.av {
+  width: 120px; height: 120px;
+  display: block;
+  color: #8a6a44;               /* 尾巴等用 currentColor，随主题走 */
+  transform-origin: 50% 100%;
+  transition: transform 160ms ease-out;
+}
+.av.av-hover { transform: translateY(-2px); }
+
+/* 表情：默认全部隐藏，按外层类点亮一个 */
+.av .av-expr { display: none; }
+.av.av-face-happy   .av-expr-happy,
+.av.av-face-worry   .av-expr-worry,
+.av.av-face-confused .av-expr-confused,
+.av.av-face-focused .av-expr-focused { display: block; }
+
+/* 待批标记：只有 av-mark-exclaim 才显示 */
+.av .av-mark { display: none; }
+.av.av-mark-exclaim .av-mark { display: block; }
+
+/* 忙碌/空闲的呼吸差异（桌面端最有信息量的一个细节） */
+@keyframes av-bob-fast { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-3px) } }
+@keyframes av-bob-slow { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-1.5px) } }
+.av-motion-bob-fast { animation: av-bob-fast 900ms ease-in-out infinite; }
+.av-motion-bob-slow { animation: av-bob-slow 2600ms ease-in-out infinite; }
+
+/* 眼睛眨动：只作用于 .av-head 内的眼睛组，避免整块跳 */
+@keyframes av-blink { 0%,96%,100% { transform: scaleY(1) } 98% { transform: scaleY(.1) } }
+.av .av-expr { transform-origin: 60px 50px; animation: av-blink 5200ms infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .av, .av .av-expr { animation: none !important; transition: none !important; }
+  .av.av-hover { transform: none; }
+}
