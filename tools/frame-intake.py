@@ -43,6 +43,29 @@ def majority_resize(img, cell):
     return out
 
 
+def mode_filter(img, n=3):
+    """n×n 多数色滤波：像素风去噪的经典手段（比中值滤波更保边，因为颜色只会取自邻域里已有的颜色）。"""
+    src = img.convert("RGBA")
+    out = src.copy()
+    r = n // 2
+    px_src = src.load()
+    px_out = out.load()
+    w, h = src.size
+    for y in range(h):
+        for x in range(w):
+            counts = {}
+            for dy in range(-r, r + 1):
+                for dx in range(-r, r + 1):
+                    nx, ny = x + dx, y + dy
+                    if 0 <= nx < w and 0 <= ny < h:
+                        c = px_src[nx, ny]
+                        counts[c] = counts.get(c, 0) + 1
+            # 平票时保留原像素，避免把细节抹平
+            best = max(counts.items(), key=lambda kv: (kv[1], kv[0] == px_src[x, y]))
+            px_out[x, y] = best[0]
+    return out
+
+
 def main(argv):
     ap = argparse.ArgumentParser(description="生成图 → 96px 候选帧（缩放/取轮廓/限色）")
     ap.add_argument("--base", required=True, help="96px 基准帧（提供轮廓 alpha）")
@@ -51,6 +74,10 @@ def main(argv):
     ap.add_argument("--cell", type=int, default=96)
     ap.add_argument("--colors", type=int, default=32)
     ap.add_argument("--alpha-threshold", type=int, default=110)
+    ap.add_argument("--resize", default="majority", choices=["majority", "lanczos"],
+                    help="缩放方式：majority=面积多数色（默认，块感强）；lanczos=平滑后量化")
+    ap.add_argument("--mode-filter", type=int, default=0,
+                    help="缩放后做 n×n 多数色滤波（3 或 5），用于压掉重采样噪点")
     args = ap.parse_args(argv)
 
     base = Image.open(args.base).convert("RGBA")
@@ -59,12 +86,18 @@ def main(argv):
         print(f"基准帧尺寸必须是 {args.cell}×{args.cell}（实际 {base.size}）", file=sys.stderr)
         return 2
 
-    small = majority_resize(cand, args.cell)
+    if args.resize == "lanczos":
+        small = cand.resize((args.cell, args.cell), Image.LANCZOS).convert("RGBA")
+    else:
+        small = majority_resize(cand, args.cell)
 
     # 限色：先量化 RGB，再把基准帧的 alpha 二值化后贴回去
     if args.colors:
         small = small.convert("RGB").quantize(colors=args.colors, method=Image.MAXCOVERAGE,
                                               dither=Image.NONE).convert("RGBA")
+    if args.mode_filter >= 3:
+        small = mode_filter(small, args.mode_filter)
+
     mask = base.getchannel("A").point(lambda v: 255 if v >= args.alpha_threshold else 0)
     small.putalpha(mask)
 
