@@ -1,0 +1,13 @@
+{
+  "name": "dsh-pet-personas",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "DSH 助手形象包（SVG persona + 状态映射）；消费者=dsplugins/dsh-os-seams 宠物浮层",
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "demo": "python3 -m http.server 8791",
+    "gen": "node ../dsplugins/dsh-os-seams/scripts/gen-persona-assets.mjs"
+  },
+  "license": "MIT"
+}
