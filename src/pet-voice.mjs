@@ -50,18 +50,18 @@ function factClause(facts = {}) {
 const LINES = {
   'mermaid-maid': {
     idle: ['在的。', '有事叫我。', '我守着。'],
-    busy: ['正在跑（{f}）。', '手上有活（{f}）。', '跑着呢，别急。'],
-    alert: ['这个要你看一眼（{f}）。', '有条不太对（{f}）。', '过来看一下（{f}）。'],
+    busy: ['正在跑，{f}。', '还在跑，{f}。', '跑着呢，别急。'],
+    alert: ['这个要你看一眼：{f}。', '有条不太对：{f}。', '过来看一下：{f}。'],
     sleep: ['先眯一会儿。', '有点困…', 'Zzz'],
-    happy: ['搞定。', '成了（{f}）。', '这件做完了。'],
+    happy: ['搞定。', '成了，{f}。', '这件做完了。'],
     unknown: ['我看不清，别信我瞎猜。', '读不到状态，先别指望我。', '这会儿判不了。'],
   },
   'whale-maid': {
     idle: ['嗯，在。', '有事喊我。', '水里守着。'],
-    busy: ['忙着呢（{f}）。', '在跑（{f}）。', '没停。'],
-    alert: ['有点不对（{f}）。', '看一眼吧（{f}）。', '这里怪怪的。'],
+    busy: ['忙着呢，{f}。', '在跑，{f}。', '没停。'],
+    alert: ['有点不对：{f}。', '看一眼吧：{f}。', '这里怪怪的。'],
     sleep: ['困…', '眯了。', 'Zzz'],
-    happy: ['成了。', '收工（{f}）。', '搞定了。'],
+    happy: ['成了。', '收工，{f}。', '搞定了。'],
     unknown: ['看不见，别问我。', '瞎了，判不了。', '不知道，不敢说。'],
   },
 }
@@ -77,7 +77,7 @@ const PLAIN = {
 
 /** 把带 `{f}` 的模板按事实落地；没有事实就把括号整段去掉（不留空壳）。 */
 function fill(template, clause) {
-  if (!clause) return template.replace(/（\{f\}）/g, '').replace(/\{f\}/g, '').trim()
+  if (!clause) return template.replace(/[，：]\{f\}|（\{f\}）|\{f\}/g, '').trim()
   return template.replace(/\{f\}/g, clause)
 }
 
@@ -105,5 +105,5 @@ export function lineFor(input = {}, seqArg) {
   const text = fill(template, clause)
   if (tone !== 'playful') return text
   const style = PERSONA_STYLE[persona]
-  return `${style.openers[seq % style.openers.length]}${text}${style.tail[seq % style.tail.length]}`
+  return `${style.openers[seq % style.openers.length]}${text}`
 }
