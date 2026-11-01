@@ -1,0 +1,12 @@
+{
+  "_comment": "mermaid 图集的覆盖清单（sleep 四帧 = pixel/frames/sleep-z，Zz 符号上下 1px 部件搬运）",
+  "sleep": {
+    "frames": [
+      "pixel/frames/sleep-z/sleep_z_0.png",
+      "pixel/frames/sleep-z/sleep_z_1.png",
+      "pixel/frames/sleep-z/sleep_z_2.png",
+      "pixel/frames/sleep-z/sleep_z_3.png"
+    ],
+    "durations": [850, 850, 850, 850]
+  }
+}

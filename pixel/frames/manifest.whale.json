@@ -1,0 +1,12 @@
+{
+  "_comment": "whale 图集的覆盖清单（sleep 四帧 = pixel/frames/sleep-z-whale，Zz 位置与 mermaid 不同：box 72,16,94,48）",
+  "sleep": {
+    "frames": [
+      "pixel/frames/sleep-z-whale/sleep_z_0.png",
+      "pixel/frames/sleep-z-whale/sleep_z_1.png",
+      "pixel/frames/sleep-z-whale/sleep_z_2.png",
+      "pixel/frames/sleep-z-whale/sleep_z_3.png"
+    ],
+    "durations": [850, 850, 850, 850]
+  }
+}

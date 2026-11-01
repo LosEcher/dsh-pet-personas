@@ -3,12 +3,44 @@
   "_why": [
     "统一帧率（旧做法：所有状态 [1800,140]）等于放弃'节奏表达状态'——睡眠和打字看起来一样快。",
     "参照 vscode-pets：每个状态是独立的 GIF，帧率与帧数各不同（walk 快、lie 慢），状态差异由素材节奏承载。",
-    "这里只借机制：数字按我们的两帧图集与 48px 显示尺寸重推，不照搬其帧率。"
+    "这里只借机制：数字按我们的两帧图集与 48px 显示尺寸重推，不照搬其帧率。",
+    "sleep 四帧来自 pixel/frames/sleep-z*/（部件搬运：Zz 符号上下 1px），不是切片产物。合成顺序必须是：slice → trim-atlas（whale 需要）→ compose-atlas；合成后不要再跑 slice，否则会被 2 列覆盖回去。"
   ],
-  "idle": { "durations": [1800, 130] },
-  "busy": { "durations": [520, 280] },
-  "alert": { "durations": [700, 220] },
-  "sleep": { "durations": [2600, 400] },
-  "happy": { "durations": [420, 200] },
-  "unknown": { "durations": [1500] }
+  "idle": {
+    "durations": [
+      1800,
+      130
+    ]
+  },
+  "busy": {
+    "durations": [
+      520,
+      280
+    ]
+  },
+  "alert": {
+    "durations": [
+      700,
+      220
+    ]
+  },
+  "sleep": {
+    "durations": [
+      850,
+      850,
+      850,
+      850
+    ]
+  },
+  "happy": {
+    "durations": [
+      420,
+      200
+    ]
+  },
+  "unknown": {
+    "durations": [
+      1500
+    ]
+  }
 }

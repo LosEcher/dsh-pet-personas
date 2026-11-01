@@ -4,7 +4,7 @@
   96
  ],
  "atlas": [
-  192,
+  384,
   576
  ],
  "states": {
@@ -32,8 +32,10 @@
   "sleep": {
    "row": 3,
    "durations": [
-    2600,
-    400
+    850,
+    850,
+    850,
+    850
    ]
   },
   "happy": {
@@ -52,5 +54,7 @@
  },
  "source": "Blue-Haired Mermaid Maid Sprite Sheet.png",
  "gridMode": "gaps",
- "slicedCells": 11
+ "slicedCells": 11,
+ "composedFrom": "pixel/frames/manifest.mermaid.json",
+ "composedAt": "2026-11-01T12:41:28Z"
 }
