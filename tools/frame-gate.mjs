@@ -173,6 +173,33 @@ export function paletteOverlap(base, cand) {
  * 主判据：给基准帧与候选帧，返回逐条结果。
  * @returns {{ok: boolean, checks: Array<{id: string, ok: boolean, actual: any, limit: any, why: string}>}}
  */
+/**
+ * 允许变更区域（`allow = {y0, y1, x0, x1}`）之外的像素必须**逐字节相同**。
+ * 这是"部件搬运"这类做法的核心判据：动作带外的像素一个都不许动
+ * （Codex 第二意见的验收第一条就是"动作区外像素完全不变"）。
+ */
+export function outsideRegionDiff(basePng, candPng, allow) {
+  const { width, height, channels, data } = basePng
+  const inRegion = (x, y) => x >= (allow.x0 ?? 0) && x <= (allow.x1 ?? width - 1)
+    && y >= (allow.y0 ?? 0) && y <= (allow.y1 ?? height - 1)
+  let outside = 0
+  let changed = 0
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      if (inRegion(x, y)) continue
+      outside += 1
+      const i = (y * width + x) * channels
+      const j = (y * width + x) * candPng.channels
+      for (let k = 0; k < 4; k += 1) {
+        const a = k < channels ? data[i + k] : (k === 3 ? 255 : 0)
+        const b = k < candPng.channels ? candPng.data[j + k] : (k === 3 ? 255 : 0)
+        if (a !== b) { changed += 1; break }
+      }
+    }
+  }
+  return { outside, changed, ratio: outside ? changed / outside : 0 }
+}
+
 export function gateCandidate(basePng, candPng, limits = {}) {
   const L = { ...DEFAULT_LIMITS, ...limits }
   const checks = []
@@ -205,13 +232,23 @@ export function gateCandidate(basePng, candPng, limits = {}) {
     '质心漂移 ⇒ 播放时上下跳，看起来在抖')
 
   // ① 有没有真改：mask 内的 RGB 差异（alpha 继承自基准帧时，掩膜差分恒为 0，是假判据）
+  //    `--allow-identical` 用于**循环动画的休息帧**：与基准相同是设计的一部分，不算白跑。
   const rgb = rgbDiffRatio(basePng, candPng, L.alphaThreshold)
-  add('changed', rgb.ratio >= L.changedMinRatio, rgb.ratio.toFixed(4), `>= ${L.changedMinRatio}`,
-    '几乎逐像素相同 ⇒ 这次生成是白跑（没改动）')
+  if (!L.allowIdentical) {
+    add('changed', rgb.ratio >= L.changedMinRatio, rgb.ratio.toFixed(4), `>= ${L.changedMinRatio}`,
+      '几乎逐像素相同 ⇒ 这次生成是白跑（没改动）')
+  }
   // ② 还是不是同一个角色：网格色距（与手绘素材自身的帧间波动比）
   const gridDist = gridColorDistance(basePng, candPng, L.identityGridN, L.alphaThreshold)
   add('identity', gridDist <= L.identityGridMax, gridDist.toFixed(4), `<= ${L.identityGridMax}`,
     '网格色距超出"同一角色相邻帧"的实测区间 ⇒ 画出来的不是这个角色了')
+
+  // 如果声明了"只允许这段变"（部件搬运），区域外必须一个像素都不动
+  if (L.allowRegion) {
+    const out = outsideRegionDiff(basePng, candPng, L.allowRegion)
+    add('outsideRegion', out.changed === 0, out.changed, '0',
+      '动作带之外有像素被改动 ⇒ 不是"部件搬运"，会破坏原帧里 1px 级的设计')
+  }
 
   // 空帧绝不能进图集（unknown 那次「每 1.94s 闪没」就是空帧引起的）
   add('nonEmpty', cand.opaque > 0, cand.opaque, '> 0', '整格透明 ⇒ 播放时会闪成消失')
@@ -229,12 +266,19 @@ if (process.argv[1]?.endsWith('frame-gate.mjs')) {
   const basePath = arg('--base')
   const candPath = arg('--cand')
   if (!basePath || !candPath) {
-    console.error('用法: node tools/frame-gate.mjs --base <base.png> --cand <cand.png> [--cell 96] [--json]')
+    console.error('用法: node tools/frame-gate.mjs --base <base.png> --cand <cand.png> [--cell 96] [--allow y0:y1] [--json]')
     process.exit(2)
   }
   let result
   try {
-    result = gateCandidate(readPng(basePath), readPng(candPath), { cell: Number(arg('--cell', 96)) })
+    const allowSpec = arg('--allow')
+    const limits = { cell: Number(arg('--cell', 96)) }
+    if (argv.includes('--allow-identical')) limits.allowIdentical = true
+    if (allowSpec) {
+      const [y0, y1] = allowSpec.split(':').map(Number)
+      limits.allowRegion = { y0, y1 }
+    }
+    result = gateCandidate(readPng(basePath), readPng(candPath), limits)
   } catch (error) {
     console.error(`判不了：${error.message}`)
     process.exit(2)
