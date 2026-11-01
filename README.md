@@ -17,7 +17,7 @@ personas/*.svg          12 个形象，每个 120×120，含 happy/worry/confuse
 personas/index.json     形象包注册表（label / parts / motion / voice / ipNote）
 persona.css             demo 用样式（浮层里有自己的等价样式）
 demo.html               本地 demo：4~12 形象 × 三维 × 交互
-test/*.test.mjs         15 用例（映射 9 + 结构 5 + 注册表一致性 1）
+test/*.test.mjs         65 用例（映射/结构/注册表 + 播放器状态图守卫 state-graph）
 preview-*.png           浏览器实测截图
 ```
 
@@ -36,7 +36,7 @@ preview-*.png           浏览器实测截图
 ## 复跑
 
 ```bash
-node --test "test/*.test.mjs"      # 15 pass
+node --test "test/*.test.mjs"      # 65 pass
 python3 -m http.server 8791        # 然后开 http://127.0.0.1:8791/demo.html
 ```
 
@@ -44,6 +44,10 @@ python3 -m http.server 8791        # 然后开 http://127.0.0.1:8791/demo.html
 
 - 表情只能由 `health` 决定：`ok→happy / attention→worry / unknown→confused`；
   **unknown 永不 happy**（点一下也不行），缺字段一律 unknown。
+- **「判不了」在播放器里是一层常驻覆盖**（`status.unknown` → `sticky`），不是一次性动作：
+  否则没有任何事件能进入 atlas 的 `unknown` 行，宠物会画成 idle 的"睁眼在岗"。
+  `test/state-graph.test.mjs` 用纯数据守住四件事：表引用的 state 在图集里、每个 state 都可达、
+  每个 opener 都被 close 收、sticky 一定有清空入口。
 - 交互只改表现：hover 抬升、点击气泡、`prefers-reduced-motion` 下无位移。
 - 新增形象 = 加一个 `personas/<id>.svg` + `index.json` 一条 + `avatar-state.mjs` 的 `PERSONAS`；
   `index.json` 与 SVG 不一致会让**插件生成期**直接失败（这是刻意的）。

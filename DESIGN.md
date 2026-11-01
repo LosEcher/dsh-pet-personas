@@ -210,7 +210,7 @@ dsh-pet-personas/
   personas/*.svg          12 个形象（各 4 表情组）
   personas/index.json     注册表（label/parts/motion/voice/ipNote）
   demo.html  persona.css  本地 demo
-  test/*.test.mjs         15 用例
+  test/*.test.mjs         65 用例（含播放器状态图守卫）
 ```
 
 **消费关系（重要）**：插件 `dsh-os-seams` 里的 `src/client/persona-assets.mjs` 与

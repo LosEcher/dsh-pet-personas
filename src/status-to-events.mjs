@@ -5,7 +5,12 @@
  *   · 一次性动作只在**真跳变**时触发；每次轮询都触发 ⇒ 宠物永远在抽搐。
  *   · `unknown` 不是"出事了"：不产生 alert，也不产生 happy。
  *   · 忙→闲 既是"任务结束"（收区间）也是"干完了"（放一次 happy），两个事件要一起发。
+ *   · `unknown` 是**持续状态**而不是一次性动作：进入时压一层 `status.unknown` 区间、
+ *     离开时收起。少了这一层，health=unknown 不产生任何事件 ⇒ 播放器停在 idle，
+ *     等于把"我看不清"画成"睁眼在岗"（表情即谎报）。atlas 里的 unknown 行就是给它用的。
  */
+const judged = (health) => health === 'ok' || health === 'attention'
+
 export function eventsFor(prev, next) {
   if (!next) return []
   const p = prev || {}
@@ -14,16 +19,29 @@ export function eventsFor(prev, next) {
   const nextBusy = next.activity === 'busy'
   const prevAttention = p.health === 'attention'
   const nextAttention = next.health === 'attention'
+  // "判得清"只有 ok / attention 两种。**next** 缺字段、'unknown'、任何别的值 ⇒ 就是判不了。
+  // **prev** 要三分：有判定 / 判定是 unknown / 根本没有上一次观察（首次挂载或旧调用方只给了部分字段）
+  // ——第三类不能算"刚才在 unknown 里"，否则首次收到正常状态会凭空发一条 status.known。
+  const prevJudged = !prev || p.health == null ? null : judged(p.health)
+  const nextUnknown = !judged(next.health)
+  const prevUnknown = prevJudged === false
+  const enteringUnknown = nextUnknown && prevJudged !== false
+  const leavingUnknown = prevUnknown && !nextUnknown
+
+  // 离开 unknown 先把区间收掉，后面开的新区间才叠得对（close 先于 open）
+  if (leavingUnknown) out.push('status.known')
 
   if (nextBusy && !prevBusy) out.push('task.start')
   if (!nextBusy && prevBusy) {
     out.push('task.end')
-    // 干完一件活：happy 只在"从忙到闲且结果不是出事"时放
-    if (!nextAttention) out.push('task.done')
+    // 干完一件活：happy 只在"从忙到闲且结果不是出事"时放；判不了时不庆祝
+    if (!nextAttention && !nextUnknown) out.push('task.done')
   }
   if (nextAttention && !prevAttention) out.push('gate.fail')
   // 出事恢复到正常：也值得高兴一下（只在 attention→ok 的真跳变）
   if (!nextAttention && prevAttention && next.health === 'ok') out.push('task.done')
+
+  if (enteringUnknown) out.push('status.unknown')
   return out
 }
 
