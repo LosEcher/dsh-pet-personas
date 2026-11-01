@@ -23,7 +23,8 @@ test('refs 清单存在且覆盖 ref/ 下所有图像', (t) => {
   for (const r of d.refs) assert.ok(r.tier, `${r.file} 没有 tier`)
 })
 
-test('关键事实（2026-11-01 实测，防止后人重复造轮子）：48px 那两张**不是** 1:1 像素画', () => {
+test('关键事实（2026-11-01 实测，防止后人重复造轮子）：48px 那两张**不是** 1:1 像素画', (t) => {
+  if (needsRefs(t)) return
   const d = JSON.parse(readFileSync(MANIFEST, 'utf8'))
   const small = d.refs.filter((r) => r.size && r.size[0] <= 64)
   assert.ok(small.length >= 2, '应当有 48px 级参考图')
@@ -34,7 +35,8 @@ test('关键事实（2026-11-01 实测，防止后人重复造轮子）：48px �
   }
 })
 
-test('48px 级矢量化成本远超栅格：这是选型依据，不是口味', () => {
+test('48px 级矢量化成本远超栅格：这是选型依据，不是口味', (t) => {
+  if (needsRefs(t)) return
   const svg = readFileSync(join(ROOT, 'pixel/art/whale-maid.vector.svg'))
   const webp = readFileSync(join(ROOT, 'pixel/art/whale-maid.48.webp'))
   assert.ok(svg.length > webp.length * 5, `矢量 ${svg.length}B 未显著大于栅格 ${webp.length}B`)
