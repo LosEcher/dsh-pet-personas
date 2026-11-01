@@ -1,0 +1,31 @@
+{
+ "cell": [
+  24,
+  24
+ ],
+ "cols": 2,
+ "rows": 3,
+ "states": {
+  "idle": {
+   "row": 0,
+   "durations": [
+    1800,
+    140
+   ]
+  },
+  "busy": {
+   "row": 1,
+   "durations": [
+    420,
+    420
+   ]
+  },
+  "alert": {
+   "row": 2,
+   "durations": [
+    1000,
+    1000
+   ]
+  }
+ }
+}
