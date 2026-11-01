@@ -86,3 +86,20 @@
 公开实现的做法高度一致：**行=状态、列=帧、一张图集、三张事件表、一个带优先级的栈**。
 我们的形象能不能"像参考图"取决于美术（描摹/手绘像素），而**能不能"对"取决于这个状态机**——
 后者才是我们之前真正缺的、也是这轮补上的东西。
+
+## 5. 接线结果（2026-11-01 10:2x，浏览器实测）
+
+`dsh-os-seams` 的浮层已从"12 个矢量 persona + 平铺 class"换成**像素图集 + 三层状态机**（提交 `d87b5bf`）：
+
+| 判据 | 实测 |
+|---|---|
+| 图集按 (col,row) 裁格 | `viewBox="0 24 24 24"`（busy 行第 0 帧），`shape-rendering="crispEdges"`，48×48 |
+| 帧会走（no-preference） | 24 次采样见到 4 种格 `0:0 / 0:1 / 1:0 / 1:1`，**20 次切换**（含 idle 眨眼帧） |
+| reduced-motion | `data-sprite=static`，**只随状态换行、不循环帧**（"不知道"不会假装在动） |
+| 状态驱动 | `data-state=busy` 由 `pet-status.activity` 推来；事件表在 `status-to-events.mjs`，5 条测试含 2 条负向控制 |
+| 单源 | 插件里的 `atlas.gen.mjs` / `sprite-player.mjs` 都是**生成物**（源在真源仓），生成期有门禁 |
+
+**我自己在这一步踩的坑**：把 `setTimeout` 的返回值当时长读（`timerRef.current?.durationMs` 恒 `undefined`），
+`tick(0)` 于是永不换帧——表现是"看起来在动其实没动"。已改成 `lastDurRef` 存上一帧时长。
+
+还剩的接线（明确未做）：点击/拖拽阈值（220ms / 4px）与"最后会话结束后延迟收摊"。
