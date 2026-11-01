@@ -1,3 +1,15 @@
-node_modules/
+# 参考素材不进公开仓：别人给的 / AI 生成的原图，来源与授权不可控，且体积大（~14MB）。
+# 需要时本地放回 ref/，脚本会读它；公开仓只保留**我们自己的**产物（atlas / svg / 文档）。
+ref/
+
+# 构建垃圾
+__pycache__/
+*.pyc
 .DS_Store
-*.log
+
+# 从 ref 素材派生的预览图（内容源自非公开素材）
+preview-whale-maid*.png
+preview-settings-panel.png
+preview-overlay-*.png
+preview-os-desktop-full.png
+refs.manifest.json

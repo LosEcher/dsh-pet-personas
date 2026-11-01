@@ -114,7 +114,7 @@
 ## 7. 验收（可机械复跑）
 
 ```bash
-cd /Users/echerlos/Downloads/aidata/assitant/pet
+cd <本仓根>
 node --test "test/*.test.mjs"      # 15 pass：状态映射 9 + 形象结构 5 + 注册表一致性 1
 ```
 

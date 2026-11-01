@@ -1,5 +1,8 @@
 # dsh-pet-personas
 
+> **非官方**：个人桌宠形象实验，不含任何厂商官方素材，也不代表其立场。
+> 参考原图（`ref/`）**刻意不入库**，原因见 [ASSETS.md](ASSETS.md)。
+
 DSH 助手形象（persona pack）的**唯一真源**：SVG 形象 + 状态映射 + 浏览器 demo。
 
 消费者是 `dsplugins/dsh-os-seams` 的宠物浮层：它用 `scripts/gen-persona-assets.mjs` 读本仓的

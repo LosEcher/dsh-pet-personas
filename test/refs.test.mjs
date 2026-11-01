@@ -7,7 +7,16 @@ import { fileURLToPath } from 'node:url'
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const MANIFEST = join(ROOT, 'refs.manifest.json')
 
-test('refs 清单存在且覆盖 ref/ 下所有图像', () => {
+// 参考素材不入公开仓：缺 ref/ 或清单时**跳过**而不是判红。
+// 判红会让人以为"门禁坏了"，进而习惯性忽略它——那比不判更糟。
+const needsRefs = (t) => {
+  if (existsSync(join(ROOT, 'ref')) && existsSync(MANIFEST)) return false
+  t.skip('ref/ 与 refs.manifest.json 不入公开仓（见 ASSETS.md）')
+  return true
+}
+
+test('refs 清单存在且覆盖 ref/ 下所有图像', (t) => {
+  if (needsRefs(t)) return
   assert.ok(existsSync(MANIFEST), '缺 refs.manifest.json（跑 npm run refs:scan）')
   const d = JSON.parse(readFileSync(MANIFEST, 'utf8'))
   assert.ok(d.count >= 20, `参考图只有 ${d.count} 个，疑似盘点漏了`)

@@ -65,3 +65,63 @@
 @media (prefers-reduced-motion: reduce) {
   .av-sprite { animation: none !important; }
 }
+
+/* ── 状态动效（2026-11-01 第三批）───────────────────────────────
+   原则：**动效表达状态，不是装饰**。每个动画只在对应状态叠加，切换时由
+   `.av-sprite` 的 pop（见文件前段）承担"过渡"，这里负责"停留时的呼吸感"。
+   全部在 prefers-reduced-motion 下关闭（状态换行照旧，不因省动效而失真）。 */
+
+/* 睡眠：慢呼吸（振幅小、周期长——不能看起来像在发抖） */
+@keyframes av-breathe {
+  0%, 100% { transform: scale(1) translateY(0) }
+  50%      { transform: scale(1.035) translateY(-1px) }
+}
+
+/* alert：短促左右轻抖（提示"有事"，不是持续摇头） */
+@keyframes av-alert-shake {
+  0%, 100% { transform: translateX(0) }
+  25%      { transform: translateX(-1px) rotate(-2deg) }
+  75%      { transform: translateX(1px) rotate(2deg) }
+}
+
+/* happy：一次小跳 */
+@keyframes av-happy-hop {
+  0%   { transform: translateY(0) }
+  35%  { transform: translateY(-3px) }
+  70%  { transform: translateY(0) }
+  85%  { transform: translateY(-1px) }
+  100% { transform: translateY(0) }
+}
+
+/* busy：轻微点头（周期 2.4s，避免"抽搐"） */
+@keyframes av-busy-nod {
+  0%, 100% { transform: rotate(0deg) }
+  40%      { transform: rotate(-1.2deg) }
+  70%      { transform: rotate(1deg) }
+}
+
+.av-sprite { transform-origin: 50% 85%; will-change: transform }
+
+[data-state="sleep"] .av-sprite { animation: av-breathe 3.6s ease-in-out infinite }
+[data-state="alert"] .av-sprite { animation: av-alert-shake .42s ease-in-out 3 }
+[data-state="happy"] .av-sprite { animation: av-happy-hop .62s ease-out 2 }
+[data-state="busy"]  .av-sprite { animation: av-busy-nod 2.4s ease-in-out infinite }
+
+/* 拖动：倾斜 + 微放大，给"被拎起来"的手感（不改位置，位置由 JS 负责） */
+[data-dragging="1"] .av-sprite { animation: none; transform: scale(1.06) rotate(-4deg) }
+
+/* 气泡：从下往上淡入（160ms，比状态 pop 稍长一点，读起来像"说话"） */
+@keyframes av-bubble-in {
+  0%   { opacity: 0; transform: translateY(3px) }
+  100% { opacity: 1; transform: translateY(0) }
+}
+.av-bubble { animation: av-bubble-in 160ms ease-out }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-state="sleep"] .av-sprite,
+  [data-state="alert"] .av-sprite,
+  [data-state="happy"] .av-sprite,
+  [data-state="busy"]  .av-sprite,
+  [data-dragging="1"] .av-sprite,
+  .av-bubble { animation: none !important }
+}
