@@ -17,7 +17,7 @@ personas/*.svg          12 个形象，每个 120×120，含 happy/worry/confuse
 personas/index.json     形象包注册表（label / parts / motion / voice / ipNote）
 persona.css             demo 用样式（浮层里有自己的等价样式）
 demo.html               本地 demo：4~12 形象 × 三维 × 交互
-test/*.test.mjs         84 用例（映射/结构/注册表 + 状态图守卫 + 闸门 + 帧节奏/像素 + CSS 契约）
+test/*.test.mjs         87 用例（映射/结构/注册表 + 状态图守卫 + 闸门 + 帧节奏/像素 + CSS 契约 + 语气/事实）
 preview-*.png           浏览器实测截图
 ```
 
@@ -63,6 +63,14 @@ python3 -m http.server 8791        # 然后开 http://127.0.0.1:8791/demo.html
   带 `var(--av-pop)`，且由测试机械咬住。
 - **朝向**：拖拽时按水平位移方向写 `--av-face:-1`，`.av-sprite { transform: scaleX(var(--av-face,1)) }`
   （照 vscode-pets 的 faceLeft/faceRight；带 6px 死区，手抖不翻身）。
+- **语气层与事实层分开**（`src/pet-voice.mjs`）：状态 → 宠物口吻的句子，但**句子里出现的数字/工具名/次数
+  必须来自传入的 `facts`**（`tools` / `runningSessions` / `failingRuns` / `sustainedMs` / `approvalPending` /
+  `night`）；事实缺席就整段去掉，不留"手上是 "这种空壳，也绝不猜一个数填上。unknown 永远不许安慰。
+  - **风格**：`persona` 决定用词习惯（女仆/鲸鱼各一套）；**语气档** `tone` 三档
+    `auto`（跟形象）/`plain`（只报事实、不演）/`playful`（加称呼与语气词）。任何档位下**事实不变**。
+  - 轮换靠 `seq` 不靠随机 ⇒ 可断言（给定 seq 得到确定句子）。
+- **素材"信息密度"要用起来**（`pinColumnForState`）：`alert` 两格其实是两档严重度（`！`/`！！`），
+  `busy` 两格是「抱电脑/抬头」。按**事实选列**而不是循环播——否则"轻微/严重"会每 1.94 秒抖一次。
 - **闸门只管一次性动作，不改事实**（`src/pet-gates.mjs`）：
   `admitsAlert` 要求"这次失败站够久"（默认 2 分钟；拿不到时长则要求连续两条）才配弹
   ——单次采样不足以下结论；`createReactionGate` 让相邻反应有间隔、同一动作有冷却。

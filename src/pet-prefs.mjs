@@ -16,6 +16,7 @@ export const DEFAULT_PREFS = Object.freeze({
   size: 48, // CSS px（Retina 上 96 设备像素，见 DESIGN-VI §8）
   idleMs: 90_000, // 多久没动静算困了
   voice: true, // 气泡用宠物口吻（关掉就只显示服务端事实）
+  tone: 'auto', // auto=形象自带语气 / plain=只报事实不演 / playful=允许俏皮
   corner: 'br', // tl / tr / bl / br
   offset: null, // 拖动后的自定义位置 { x, y }（相对视口右下为基准，见 clampOffset）
 })
@@ -24,6 +25,7 @@ const PERSONAS = ['mermaid-maid', 'whale-maid']
 const SIZES = [40, 48, 56, 64]
 const IDLE = [30_000, 60_000, 90_000, 180_000, 600_000]
 const CORNERS = ['tl', 'tr', 'bl', 'br']
+const TONES = ['auto', 'plain', 'playful']
 
 const pick = (value, allowed, fallback) => (allowed.includes(value) ? value : fallback)
 /**
@@ -53,6 +55,7 @@ export function normalize(raw) {
     size: pickInRange(src.size, SIZES, 32, 96, DEFAULT_PREFS.size),
     idleMs: pickInRange(src.idleMs, IDLE, 15_000, 3_600_000, DEFAULT_PREFS.idleMs),
     voice: typeof src.voice === 'boolean' ? src.voice : DEFAULT_PREFS.voice,
+    tone: pick(src.tone, TONES, DEFAULT_PREFS.tone),
     corner: pick(src.corner, CORNERS, DEFAULT_PREFS.corner),
     offset,
   }
