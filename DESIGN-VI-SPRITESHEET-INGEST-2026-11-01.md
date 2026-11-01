@@ -1,0 +1,71 @@
+# 你给的 `Pixel Whale Maid Sprite Sheet.png` 怎么处理（2026-11-01）
+
+## 1. 这张图是什么
+
+- 1254×1254 RGBA，**透明底**（α 通道干净，不用抠白底）。
+- 左边是 **11 个角色帧**（2 列 × 6 行，最后一行只有 1 个）；右边是**带 `pet.json` 的规格面板**。
+- 每个角色在原图里约 **250×204 px**，而 `pet.json` 声明 `cell:[48,48]`、`atlas:[96,288]`
+  ⇒ 这是一张**给人看的放大预览图**（约 4.3 倍），不是可直接切的原生 atlas。
+
+## 2. 为什么不能直接按格切
+
+我先按"裁 2×6 等分"试过，结果是**行错位、角色被压扁**。根因两个：
+
+1. **格距与角色包围盒不重合**：横向两列中心距 ~386px，纵向行距 ~208px，而角色本身 ~250×204；
+2. **相邻格的装饰会连成一块**：`busy` 行的"电脑/点赞"两格的装饰线相连，连通域分析给出一个
+   跨两行的大块（h=412），按连通域切必然把两个角色塞进一格。
+
+## 3. 实际用的切法（`tools/slice-sprite-sheet.py`）
+
+1. α>128 做掩膜；用 `--right-cut 800` 把右侧 `pet.json` 面板排掉；
+2. 连通域只用来**估格距**（取全部块的行/列范围），**不用来定边界**；
+3. 按等间距格带（6 行 × 2 列）逐格**重新求格内的 α 包围盒** → 居中裁成正方形 → LANCZOS 缩到 48×48；
+4. 统一 α 阈值（≥110 才保留），逐格量化到 24 色并拼成 `96×288` atlas；
+5. 写 `atlas.json`（`cell/atlas/states[row,durations]`，行序 = idle/busy/alert/sleep/happy/unknown）。
+
+## 4. 踩到的两个真问题（都有量化证据）
+
+### 4.1 量化会把"语义色"抹掉
+
+| 做法 | alert 行暖色像素（源图 5106） | PNG | WebP |
+|---|---|---|---|
+| 逐格 MEDIANCUT 24 色 | **0** | 26.4 KB | 7.8 KB |
+| 逐格 MEDIANCUT 48/64 色 | **0** | 35–38 KB | 9.7–10.6 KB |
+| 全局 MEDIANCUT 32 色 | **0** | 40 KB | 15.7 KB |
+| **全局 MAXCOVERAGE 32 色** | **159** ✅ | 23.2 KB | **7.4 KB** |
+
+MEDIANCUT 按像素数量分配调色板，"橙/红感叹号"这种**又小又饱和**的颜色分不到名额，直接被并进灰蓝——
+而那正是"出事"这个状态的唯一视觉载体。已改用 **MAXCOVERAGE**，并在脚本里加了门禁：
+**该行暖色像素被抹成 0 就 exit 1**（比例低不算失败：源图是 4.3 倍放大，暖色像素本就被抗锯齿摊薄）。
+
+### 4.2 抖动会毁掉压缩
+
+`dither=NONE` 必须显式设：开启抖动时同一张图 PNG 40 KB / WebP 15.7 KB，关掉后 23 KB / 7.4 KB。
+
+## 5. 产物
+
+```
+pixel/art/whale-maid-sheet.atlas.png    96×288，23.2 KB
+pixel/art/whale-maid-sheet.atlas.webp   **7.4 KB**（无损，data-URI 后 ~9.9 KB）
+pixel/art/whale-maid-sheet.atlas.json    cell/atlas/states[row,durations]
+pixel/art/whale-maid-sheet.preview.png  4× 放大预览（肉眼核对用）
+tools/slice-sprite-sheet.py             可复跑：--cell/--rows/--cols/--right-cut/--colors
+```
+
+## 6. 已接进真实浮层（浏览器实测）
+
+`dsh-os-seams` 的浮层改为**栅格 atlas + `background-position`**（oneko.js 同招）：
+
+| 判据 | 实测 |
+|---|---|
+| 显示 | 48×48，`image-rendering: pixelated` |
+| 裁格 | `background-size: 96px 288px`，`background-position: 0px -48px`（busy 行） |
+| 帧循环 | 采样见到 `1:0` / `1:1` 两帧交替 |
+| 素材 | `data:image/webp;base64,UklGR…`（真 WebP） |
+| 体积 | atlas 7.4 KB（此前手绘矢量图集 47.4 KB） |
+
+## 7. 下次给素材的最短路径
+
+**只要一张原生的 96×288 PNG（或 WebP），cell 48×48、透明底、行=状态**——那我连切都不用切，
+`tools/slice-sprite-sheet.py` 可以直接跳过，生成器直接读它就是 atlas。你这张是"放大预览图"，
+所以中间多了切格 + 缩放 + 量化的三步（每步都有可测的损失风险）。

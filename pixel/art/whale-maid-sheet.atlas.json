@@ -1,0 +1,56 @@
+{
+ "cell": [
+  48,
+  48
+ ],
+ "atlas": [
+  96,
+  288
+ ],
+ "states": {
+  "idle": {
+   "row": 0,
+   "durations": [
+    1800,
+    140
+   ]
+  },
+  "busy": {
+   "row": 1,
+   "durations": [
+    1800,
+    140
+   ]
+  },
+  "alert": {
+   "row": 2,
+   "durations": [
+    1800,
+    140
+   ]
+  },
+  "sleep": {
+   "row": 3,
+   "durations": [
+    1800,
+    140
+   ]
+  },
+  "happy": {
+   "row": 4,
+   "durations": [
+    1800,
+    140
+   ]
+  },
+  "unknown": {
+   "row": 5,
+   "durations": [
+    1800,
+    140
+   ]
+  }
+ },
+ "source": "Pixel Whale Maid Sprite Sheet.png",
+ "slicedCells": 11
+}

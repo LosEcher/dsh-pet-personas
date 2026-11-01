@@ -1,6 +1,6 @@
 {
  "scannedAt": null,
- "count": 26,
+ "count": 27,
  "refs": [
   {
    "file": "DeepSeek Whale Maid Character Sheet.png",
@@ -17,6 +17,22 @@
    "is1to1PixelArt": false,
    "tier": "illustration",
    "bytes": 2751270
+  },
+  {
+   "file": "Pixel Whale Maid Sprite Sheet.png",
+   "format": "PNG",
+   "size": [
+    1254,
+    1254
+   ],
+   "mode": "RGBA",
+   "hasAlpha": true,
+   "colors": 216776,
+   "opaquePixels": 769666,
+   "avgBlockPx": 3.55,
+   "is1to1PixelArt": false,
+   "tier": "illustration",
+   "bytes": 2049820
   },
   {
    "file": "grok-image-04cfb2f7-45c9-484e-b643-76165747f932.png",
