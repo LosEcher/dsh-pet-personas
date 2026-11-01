@@ -50,12 +50,21 @@ export function deriveAvatar(status = {}, interaction = {}) {
     health,
     activity,
     approval,
+    // 哪些维度是 unknown（供消费者降级措辞）。注意：`approval` 是**刻意静默维**
+    //（没有待批数据时我们不宣称"没有待批"），所以它 unknown **不得**把表情改成 confused，
+    // 否则浮层会永远显示"疑惑"。表情仍只由 health 决定。
+    unknownDims: [
+      ...(health === 'unknown' ? ['health'] : []),
+      ...(activity === 'unknown' ? ['activity'] : []),
+      ...(approval === 'unknown' ? ['approval'] : []),
+    ],
     face,
     body: ACTIVITY_POSE[activity],
     mark: APPROVAL_MARK[approval],
     persona,
     // 动画开关：reduceMotion 关掉所有位移，只留表情变化
-    motion: interaction.reduceMotion ? 'none' : activity === 'busy' ? 'bob-fast' : 'bob-slow',
+    // activity=unknown 必须是「不呼吸」，不能与 idle 同款 —— 否则"不知道忙不忙"会被画成"闲着"
+    motion: interaction.reduceMotion || activity === 'unknown' ? 'none' : activity === 'busy' ? 'bob-fast' : 'bob-slow',
     hoverLift: Boolean(interaction.hover) && !interaction.reduceMotion,
     bubble,
     // 供 DOM 直接落 class：`av-face-<face>` / `av-mark-exclaim` / `av-motion-bob-fast`
@@ -64,7 +73,7 @@ export function deriveAvatar(status = {}, interaction = {}) {
       `av-face-${face}`,
       `av-body-${ACTIVITY_POSE[activity]}`,
       APPROVAL_MARK[approval] ? `av-mark-${APPROVAL_MARK[approval]}` : 'av-mark-none',
-      `av-motion-${interaction.reduceMotion ? 'none' : activity === 'busy' ? 'bob-fast' : 'bob-slow'}`,
+      `av-motion-${interaction.reduceMotion || activity === 'unknown' ? 'none' : activity === 'busy' ? 'bob-fast' : 'bob-slow'}`,
       interaction.hover && !interaction.reduceMotion ? 'av-hover' : '',
     ].filter(Boolean),
   }

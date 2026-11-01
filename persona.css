@@ -1,14 +1,19 @@
-/* 形象渲染的公共样式：只认 .av-* 类，不认具体形象。
-   规则：一次只显示一个 .av-expr-*；.av-mark 仅在 .av-mark-exclaim 下显示；
-        reduced-motion 下所有位移动画停止（保留表情切换）。 */
+/* 形象渲染的公共样式（**唯一真源**：插件注入版由 scripts/gen-persona-assets.mjs 从这里生成）。
+   规则：
+   - 一次只显示一个 .av-expr-*；.av-mark 仅在 .av-mark-exclaim 下显示；
+   - 呼吸动画挂在**内层 svg** 上，.av 只负责 hover 位移（否则 animation 会覆盖 transform，
+     让 hover 抬升彻底失效 —— 2026-11-01 Kimi 评审指出的真实缺陷）；
+   - 眨眼只作用于 `.av-eyes`（没有该组就不眨），不要缩放整个表情组（会把嘴和眉一起压扁）；
+   - `prefers-reduced-motion` 关掉一切位移，但保留**静态姿势差**（busy 歪头）以免忙/闲不可分辨。 */
 .av {
   width: 120px; height: 120px;
   display: block;
-  color: #8a6a44;               /* 尾巴等用 currentColor，随主题走 */
+  color: inherit;                 /* 不再写死色值：跟随外部文本色/主题，尾巴等用 currentColor */
   transform-origin: 50% 100%;
   transition: transform 160ms ease-out;
 }
 .av.av-hover { transform: translateY(-2px); }
+.av > svg { display: block; width: 100%; height: 100%; transform-origin: 50% 100%; }
 
 /* 表情：默认全部隐藏，按外层类点亮一个 */
 .av .av-expr { display: none; }
@@ -21,17 +26,29 @@
 .av .av-mark { display: none; }
 .av.av-mark-exclaim .av-mark { display: block; }
 
-/* 忙碌/空闲的呼吸差异（桌面端最有信息量的一个细节） */
-@keyframes av-bob-fast { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-3px) } }
-@keyframes av-bob-slow { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-1.5px) } }
-.av-motion-bob-fast { animation: av-bob-fast 900ms ease-in-out infinite; }
-.av-motion-bob-slow { animation: av-bob-slow 2600ms ease-in-out infinite; }
+/* 呼吸：busy 1.4s / 1px，idle 4.2s / 0.5px（2026-11-01 依 Kimi 评审改：原 0.9s/3px 太急促） */
+@keyframes av-bob-fast { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-1px) } }
+@keyframes av-bob-slow { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-0.5px) } }
+.av.av-motion-bob-fast > svg { animation: av-bob-fast 1400ms ease-in-out infinite; }
+.av.av-motion-bob-slow > svg { animation: av-bob-slow 4200ms ease-in-out infinite; }
 
-/* 眼睛眨动：只作用于 .av-head 内的眼睛组，避免整块跳 */
-@keyframes av-blink { 0%,96%,100% { transform: scaleY(1) } 98% { transform: scaleY(.1) } }
-.av .av-expr { transform-origin: 60px 50px; animation: av-blink 5200ms infinite; }
+/* 眨眼只压眼组；没有 .av-eyes 的形象就不眨（宁可不眨，也不要把嘴压扁） */
+@keyframes av-blink { 0%,96%,100% { transform: scaleY(1) } 98% { transform: scaleY(.12) } }
+.av .av-eyes { transform-box: fill-box; transform-origin: center; animation: av-blink 5600ms infinite; }
+
+/* 忙/闲的**静态**姿势差：reduced-motion 下仍可分辨 */
+.av.av-body-work .av-head { transform-box: fill-box; transform-origin: 50% 100%; transform: rotate(-3deg); }
+.av.av-body-rest .av-head { transform-box: fill-box; transform-origin: 50% 100%; transform: rotate(0deg); }
+
+/* 一次性动作（由消费者在**状态跳变**时加 class，最长 600ms 后移除；reduced-motion 下不触发） */
+@keyframes av-once-error { 0%,100% { transform: translateX(0) } 25% { transform: translateX(-1.5px) } 75% { transform: translateX(1.5px) } }
+@keyframes av-once-success { 0%,100% { transform: translateY(0) } 40% { transform: translateY(-2px) } 70% { transform: translateY(0) } }
+@keyframes av-once-nod { 0%,100% { transform: rotate(0) } 45% { transform: rotate(-6deg) } 78% { transform: rotate(2deg) } }
+.av.av-once-error > svg { animation: av-once-error 320ms ease-out 1; }
+.av.av-once-success > svg { animation: av-once-success 460ms ease-out 1; }
+.av.av-once-nod .av-head { transform-box: fill-box; transform-origin: 50% 100%; animation: av-once-nod 380ms ease-out 1; }
 
 @media (prefers-reduced-motion: reduce) {
-  .av, .av .av-expr { animation: none !important; transition: none !important; }
+  .av, .av * { animation: none !important; transition: none !important; }
   .av.av-hover { transform: none; }
 }

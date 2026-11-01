@@ -223,3 +223,42 @@ gemini-maid（星星紫）/ glm-maid（黑白）/ claude-maid（向日葵橙）/
 
 浏览器实测：在真实浮层里 **shift+点击循环到全部 12 个**（`data-persona` 逐个变化），
 截图 `preview-overlay-claude-maid.png`（向日葵橙发女仆）。
+
+## 11. Kimi 评审与采纳（2026-11-01）
+
+**评审=Kimi 2.4.1（只读，≈9 min，`kimi -p`），采纳 11 条 / 部分采纳 2 条 / 明确不改 3 条。**
+
+### 采纳（都已落地，可用 `npm test` 复跑）
+
+| # | 问题 | 改法 |
+|---|---|---|
+| 1 | 34px 下 1 SVG 单位只有 0.283px：`r=1.5` 高光、`stroke-width=1` 围裙中线、`r=1.3` 纽扣、`.8` 扇骨全是亚像素噪声 | 亚像素元素**删除**；嘴/眉/眼线统一 `2.8`；猫胡须 `1.6→2.8`（那是识别特征，不删） |
+| 2 | `?`/`!` 用 `<text>`（34px 下字高 3.4px，且依赖字体） | 全部换成**矢量**：`av-qmark` 描边路径、`av-bang` 竖条+圆点。产物里 `<text>` 计数 = **0** |
+| 3 | 眨眼选择器缩放整个 `.av-expr`，嘴和眉一起被压扁 | 先移除该规则（改由 `.av-eyes` 承载，见"未采纳"），宁可不眨也不压嘴 |
+| 4 | 呼吸动画与外层 hover 抢 `transform`，hover 抬升失效 | 呼吸移到**内层 `svg`**，`.av` 只负责 hover |
+| 5 | `.av` 写死 `color`，`currentColor` 并不跟随主题 | 改 `color: inherit` |
+| 6 | 真源 `persona.css` 与插件注入版**已漂移** | 注入 CSS 改由生成器从真源生成（`persona-css.gen.mjs`） |
+| 7 | 节律太急促（0.9s/3px） | busy **1.4s/1px**、idle **4.2s/0.5px** |
+| 8 | `activity=unknown` 与 `idle` 都是慢呼吸（"不知道忙不忙"被画成"闲着"） | unknown → **不呼吸**（`motion: none`），加负向控制用例 |
+| 9 | `gemini` 星星 `scale(.62) translate(-4,-6)` 把星形拉到左上角 | 改成围绕自身的正确写法，星形回到刘海两侧 |
+| 10 | `gemini` 双马尾、`qwen` 编发、`grok` 卷发**没进轮廓**（只靠圆点暗示） | 各自补了大轮廓部件（`av-twintail` / `av-braid` 泪滴三节 / `av-curls` C 形卷） |
+| 11 | 七个女仆缺上眼睑 | 统一加 `av-lashes`（对所有表情生效，`stroke-width=2.8`） |
+
+### 部分采纳
+
+- **状态歧义**：Kimi 建议「任一维度 unknown 就变 confused」。只采纳了 activity 那半边（见 #8）；
+  **approval 不采纳**——它是**刻意静默维**（没有待批数据时我们不宣称"没有待批"），若据此变 confused，
+  浮层会永远显示"疑惑"。改为在 `pose.unknownDims` 里**如实暴露**，由消费者决定措辞，表情仍只由 `health` 决定。
+- **一次性动作**：keyframes 与 class（`av-once-error/success/nod`）已进 CSS；**状态跳变时加 class 的 JS 接线未做**。
+
+### 明确不改
+
+1. 不引入 Lottie/Rive/Live2D（0KB 运行时 + 离线矢量的契约优先）。
+2. 不把表情/参考图转位图或精灵图（28px 下信息层级不会因此变好）。
+3. 不把状态判断塞进 CSS 或复制进 12 个 SVG（`deriveAvatar` 仍是唯一决定者）。
+
+### 本轮自己踩到并补上的门禁
+
+按 Kimi 建议批量改 SVG 时，我用**非贪婪正则**插入 `<g>`，把 3 个文件改成了**非法 XML**
+（`claude-maid` / `gpt-maid` 漏闭合、`qwen-maid` 多闭合）——而当时的结构测试只做**子串断言**，全绿通过。
+已修，并新增两条铁门禁：**XML 标签平衡校验**（`test/xml-lite.mjs`，零依赖）+ 1 条负向控制（故意漏 `</g>` 必红）。

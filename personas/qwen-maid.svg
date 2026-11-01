@@ -2,24 +2,25 @@
   <!-- 特征：深蓝长发 + 侧辫 + 白底蓝纹长衣 + 折扇 + 蓝瞳。 -->
   <g class="av-shadow"><ellipse cx="60" cy="114" rx="21" ry="4.2" opacity=".2"/></g>
   <g class="av-hair-back"><path d="M20 60c0-26 18-41 40-41s40 15 40 41c0 21-4 33-11 41-6 7-11 1-8-5 3-7 4-17 2-23-3-9-11-14-23-14s-20 5-23 14c-2 6-1 16 2 23 3 6-2 12-8 5-7-8-11-20-11-41Z" fill="#2b4a7e"/><path d="M22 84c-2 12 1 20 6 24 4 4-2 7-5 2-4-7-5-17-2-26Z" fill="#1f3a66"/></g>
-  <g class="av-body"><path d="M42 88h36l6 22H36Z" fill="#f7f4ee"/><path d="M50 88h20l3 22H47Z" fill="#fff"/><path d="M60 88v22" stroke="#dfe8f5" stroke-width="1"/><path d="M55 84l5 4 5-4-5-2Z" fill="#2b4a7e"/><rect x="54" y="78" width="12" height="8" rx="3" fill="#f7dcc4"/><g stroke="#b9cfe8" stroke-width="1.2" opacity=".9"><path d="M44 94c3 3 3 8 0 11"/><path d="M76 94c-3 3-3 8 0 11"/></g></g>
+<g class="av-body"></g><g class="av-pleat" opacity=".3"></g>
   <g class="av-arms"><path d="M42 92c-5 5-6 10-5 14" stroke="#f7f4ee" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M78 92c5 5 6 10 5 14" stroke="#f7f4ee" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="37" cy="108" r="3.6" fill="#fff"/><circle cx="83" cy="108" r="3.6" fill="#fff"/></g>
   <!-- 折扇（右手侧） -->
-  <g class="av-prop"><path d="M84 96c8-8 12-16 12-22" stroke="#c9a06a" stroke-width="2" fill="none"/><path d="M78 82c8-4 16-4 22 0-6 8-16 10-22 0Z" fill="#eaf1fb" stroke="#b9cfe8" stroke-width="1"/><path d="M84 82l2-8M90 82l1-9M96 82l0-9" stroke="#b9cfe8" stroke-width=".8"/></g>
+  <g class="av-prop"><path d="M84 96c8-8 12-16 12-22" stroke="#c9a06a" stroke-width="3" fill="none"/><path d="M78 82c8-4 16-4 22 0-6 8-16 10-22 0Z" fill="#eaf1fb" stroke="#9fb8d8" stroke-width="2.8"/></g>
   <g class="av-head">
     <circle cx="60" cy="54" r="25" fill="#fbe3d0"/>
     <!-- 侧辫 -->
     <path d="M32 46c-4 10-3 20 2 26 4 5-2 8-5 3-3-6-3-18 3-29Z" fill="#2b4a7e"/>
-    <g fill="#25416e" opacity=".8"><circle cx="34" cy="58" r="2.2"/><circle cx="35" cy="64" r="2.2"/><circle cx="36" cy="70" r="2.2"/></g>
+    <g class="av-braid" fill="#25416e"><path d="M32 55c3.6 0 4.8 3.6 3.4 5.8-1 1.8-4.2 2.2-5.4.5-1.5-1.9-.6-6.3 2-6.3Z"/><path d="M33.4 62c3.6 0 4.8 3.6 3.4 5.8-1 1.8-4.2 2.2-5.4.5-1.5-1.9-.6-6.3 2-6.3Z"/><path d="M34.8 69c3.6 0 4.8 3.6 3.4 5.8-1 1.8-4.2 2.2-5.4.5-1.5-1.9-.6-6.3 2-6.3Z"/><path d="M29 76h9l-2 4.4h-5Z" opacity=".9"/></g>
     <ellipse cx="44" cy="63" rx="4" ry="2.2" fill="#f2a7a7" opacity=".45"/><ellipse cx="76" cy="63" rx="4" ry="2.2" fill="#f2a7a7" opacity=".45"/>
-    <g class="av-expr av-expr-happy"><ellipse cx="50" cy="55" rx="6.2" ry="7.8" fill="#fff"/><ellipse cx="70" cy="55" rx="6.2" ry="7.8" fill="#fff"/><circle cx="50" cy="56" r="4.6" fill="#2b4a7e"/><circle cx="70" cy="56" r="4.6" fill="#2b4a7e"/><circle cx="48.4" cy="53.6" r="1.5" fill="#fff"/><circle cx="68.4" cy="53.6" r="1.5" fill="#fff"/><path d="M55 67q5 4 10 0" stroke="#a9603a" stroke-width="2" fill="none" stroke-linecap="round"/></g>
-    <g class="av-expr av-expr-worry"><ellipse cx="50" cy="56" rx="5.8" ry="7" fill="#fff"/><ellipse cx="70" cy="56" rx="5.8" ry="7" fill="#fff"/><circle cx="50" cy="57" r="4" fill="#2b4a7e"/><circle cx="70" cy="57" r="4" fill="#2b4a7e"/><path d="M44 47l7 3M76 47l-7 3" stroke="#2b4a7e" stroke-width="1.8" stroke-linecap="round"/><path d="M56 69q4-3 8 0" stroke="#a9603a" stroke-width="2" fill="none" stroke-linecap="round"/></g>
-    <g class="av-expr av-expr-confused"><ellipse cx="50" cy="55" rx="5.8" ry="7.2" fill="#fff"/><ellipse cx="70" cy="55" rx="5.8" ry="7.2" fill="#fff"/><circle cx="50" cy="56" r="4" fill="#2b4a7e"/><circle cx="70" cy="56" r="4" fill="#2b4a7e"/><path d="M55 68h10" stroke="#a9603a" stroke-width="2" stroke-linecap="round"/><text x="90" y="36" font-size="14" fill="#8a8a8a">?</text></g>
-    <g class="av-expr av-expr-focused"><path d="M44 53h9M67 53h9" stroke="#2b4a7e" stroke-width="2.4" stroke-linecap="round"/><circle cx="50" cy="57" r="3.2" fill="#2b4a7e"/><circle cx="70" cy="57" r="3.2" fill="#2b4a7e"/><path d="M55 68h10" stroke="#a9603a" stroke-width="2" stroke-linecap="round"/></g>
+    <g class="av-lashes" fill="none" stroke="#3a3340" stroke-width="2.8" stroke-linecap="round"><path d="M43 47q7-4 14-1"/><path d="M63 46q7-3 14 1"/></g>
+    <g class="av-expr av-expr-happy"><ellipse cx="50" cy="55" rx="6.2" ry="7.8" fill="#fff"/><ellipse cx="70" cy="55" rx="6.2" ry="7.8" fill="#fff"/><circle cx="50" cy="56" r="4.6" fill="#2b4a7e"/><circle cx="70" cy="56" r="4.6" fill="#2b4a7e"/><circle cx="48.4" cy="53.6" r="1.5" fill="#fff"/><circle cx="68.4" cy="53.6" r="1.5" fill="#fff"/><path d="M55 67q5 4 10 0" stroke="#a9603a" stroke-width="2.8" fill="none" stroke-linecap="round"/></g>
+    <g class="av-expr av-expr-worry"><ellipse cx="50" cy="56" rx="5.8" ry="7" fill="#fff"/><ellipse cx="70" cy="56" rx="5.8" ry="7" fill="#fff"/><circle cx="50" cy="57" r="4" fill="#2b4a7e"/><circle cx="70" cy="57" r="4" fill="#2b4a7e"/><path d="M44 47l7 3M76 47l-7 3" stroke="#2b4a7e" stroke-width="2.8" stroke-linecap="round"/><path d="M56 69q4-3 8 0" stroke="#a9603a" stroke-width="2.8" fill="none" stroke-linecap="round"/></g>
+    <g class="av-expr av-expr-confused"><ellipse cx="50" cy="55" rx="5.8" ry="7.2" fill="#fff"/><ellipse cx="70" cy="55" rx="5.8" ry="7.2" fill="#fff"/><circle cx="50" cy="56" r="4" fill="#2b4a7e"/><circle cx="70" cy="56" r="4" fill="#2b4a7e"/><path d="M55 68h10" stroke="#a9603a" stroke-width="2.8" stroke-linecap="round"/><g class="av-qmark" fill="none" stroke="#8a8a8a" stroke-width="2.8" stroke-linecap="round"><path d="M86 31c0-4 6-4 6 0 0 3-6 3-6 7"/><circle cx="86" cy="42" r="1.7" fill="#8a8a8a" stroke="none"/></g></g>
+    <g class="av-expr av-expr-focused"><path d="M44 53h9M67 53h9" stroke="#2b4a7e" stroke-width="2.8" stroke-linecap="round"/><circle cx="50" cy="57" r="3.2" fill="#2b4a7e"/><circle cx="70" cy="57" r="3.2" fill="#2b4a7e"/><path d="M55 68h10" stroke="#a9603a" stroke-width="2.8" stroke-linecap="round"/></g>
   </g>
   <g class="av-hair-front">
     <path d="M34 50c1-15 13-24 26-24s25 9 26 24c-6-7-12-9-17-7-6-7-16-9-23-5-5 3-9 7-11 12Z" fill="#2b4a7e"/>
     <path d="M60 27c-2 8-1 14 2 18 2 3-2 6-5 3-3-5-3-13 3-21Z" fill="#3a5d96"/>
   </g>
-  <g class="av-mark" aria-hidden="true"><circle cx="96" cy="24" r="9" fill="#e0453a"/><text x="96" y="29" font-size="12" text-anchor="middle" fill="#fff">!</text></g>
+  <g class="av-mark" aria-hidden="true"><circle cx="96" cy="24" r="9" fill="#e0453a"/><g class="av-bang"><rect x="91.4" y="16" width="3.4" height="9.6" rx="1.7" fill="#fff"/><circle cx="93.1" cy="29.4" r="1.9" fill="#fff"/></g></g>
 </svg>

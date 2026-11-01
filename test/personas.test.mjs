@@ -1,6 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync, existsSync } from 'node:fs'
+import { XMLParser } from './xml-lite.mjs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { PERSONAS } from '../avatar-state.mjs'
@@ -59,4 +60,18 @@ test('persona 注册表与代码常量不漂（index.json ↔ PERSONAS）', () =
     assert.ok(p.ipNote && p.ipNote.length > 4, `${p.id} 缺 ipNote（IP 门要求写清来源）`)
     assert.equal(p.viewBox.join(','), '0,0,120,120')
   }
+})
+
+test('每个 SVG 必须是**合法 XML**（子串断言抓不到标签不平衡，2026-11-01 实证）', () => {
+  for (const p of PERSONAS) {
+    const s = readFileSync(join(ROOT, 'personas', `${p}.svg`), 'utf8')
+    let err = null
+    try { XMLParser(s) } catch (e) { err = e.message }
+    assert.equal(err, null, `${p}.svg XML 不合法：${err}`)
+  }
+})
+
+test('负向控制：故意漏一个 </g> 必须报错（证明上一条真的在检）', () => {
+  const broken = '<svg xmlns="http://www.w3.org/2000/svg"><g class="a"><path d="M0 0"/></svg>'
+  assert.throws(() => XMLParser(broken), /unclosed|mismatch/i)
 })

@@ -40,6 +40,21 @@ test('reduced motion 关掉位移动画与 hover 抬升', () => {
   assert.ok(p.classes.includes('av-motion-none'))
 })
 
+test('负向控制④：activity=unknown 不得与 idle 同款（不呼吸，而不是慢呼吸）', () => {
+  assert.equal(deriveAvatar({ health: 'ok', activity: 'unknown' }).motion, 'none')
+  assert.equal(deriveAvatar({ health: 'ok', activity: 'idle' }).motion, 'bob-slow')
+  assert.equal(deriveAvatar({ health: 'ok', activity: 'busy' }).motion, 'bob-fast')
+})
+
+test('unknownDims 如实暴露，但 approval=unknown 不得把表情改成 confused（静默维）', () => {
+  const p = deriveAvatar({ health: 'ok', activity: 'idle', approval: 'unknown' })
+  assert.deepEqual(p.unknownDims, ['approval'])
+  assert.equal(p.face, 'happy', 'approval 是静默维：没有数据不等于看不清')
+  const q = deriveAvatar({ health: 'unknown' })
+  assert.equal(q.face, 'confused')
+  assert.ok(q.unknownDims.includes('health'))
+})
+
 test('busy 与 idle 的动作不同；hover 抬升只在非 reduced 下出现', () => {
   assert.equal(deriveAvatar({ activity: 'busy' }).motion, 'bob-fast')
   assert.equal(deriveAvatar({ activity: 'idle' }).motion, 'bob-slow')
