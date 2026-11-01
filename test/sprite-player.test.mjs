@@ -85,3 +85,30 @@ test('表格是数据不是代码：换成别的表就换一套语义', () => {
   assert.equal(p.snapshot().state, 'busy')
   assert.ok(DEFAULT_TABLES.open['session.start'], '默认表仍保留原语义')
 })
+
+test('unknown 是单帧：怎么 tick 都停在第 0 列（不会闪成空白）', () => {
+  // 实测背景（2026-11-01）：unknown 行第二格 α 全 0，而 durations 曾是 [1800,140]
+  // ⇒ 每 1.94 秒画一格空白，宠物"消失"140ms。单帧是**素材事实**决定的，不是口味。
+  const states = {
+    idle: { row: 0, durations: [1800] },
+    unknown: { row: 5, durations: [1500] },
+  }
+  const p = createPlayer({ states, initial: 'idle' })
+  p.applyEvent('status.unknown')
+  assert.equal(p.snapshot().state, 'unknown')
+  for (let i = 0; i < 40; i += 1) {
+    p.tick(500)
+    assert.equal(p.snapshot().col, 0, 'unknown 只有一帧，col 不该前进')
+  }
+})
+
+test('负向控制：给 unknown 两帧就会走到第 1 列（证明上一条不是恒真）', () => {
+  const states = {
+    idle: { row: 0, durations: [1800] },
+    unknown: { row: 5, durations: [1800, 140] },   // 旧配置：第二格是空白
+  }
+  const p = createPlayer({ states, initial: 'idle' })
+  p.applyEvent('status.unknown')
+  p.tick(1900)
+  assert.equal(p.snapshot().col, 1, '两帧时确实会翻到空白帧 —— 这正是被修掉的行为')
+})

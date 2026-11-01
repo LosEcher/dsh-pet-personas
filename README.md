@@ -17,7 +17,7 @@ personas/*.svg          12 个形象，每个 120×120，含 happy/worry/confuse
 personas/index.json     形象包注册表（label / parts / motion / voice / ipNote）
 persona.css             demo 用样式（浮层里有自己的等价样式）
 demo.html               本地 demo：4~12 形象 × 三维 × 交互
-test/*.test.mjs         72 用例（映射/结构/注册表 + 状态图守卫 + 反应/持续闸门）
+test/*.test.mjs         84 用例（映射/结构/注册表 + 状态图守卫 + 闸门 + 帧节奏/像素 + CSS 契约）
 preview-*.png           浏览器实测截图
 ```
 
@@ -49,6 +49,20 @@ python3 -m http.server 8791        # 然后开 http://127.0.0.1:8791/demo.html
   `test/state-graph.test.mjs` 用纯数据守住四件事：表引用的 state 在图集里、每个 state 都可达、
   每个 opener 都被 close 收、sticky 一定有清空入口。
 - 交互只改表现：hover 抬升、点击气泡、`prefers-reduced-motion` 下无位移。
+- **帧节奏有唯一真源**（`pixel/art/pet-cadence.json`）：`tools/slice-sprite-sheet.py` 把它写进
+  `*.atlas.json`，测试断言两边一致。旧做法是**所有状态共用 `[1800,140]`**——等于放弃"节奏表达状态"
+  （睡眠和打字一样快）。现在是 idle 1.8s 眨眼 / busy 520ms 打字 / alert 700ms 惊两次 / sleep 2.6s 慢 Z /
+  happy 420ms 心跳一下 / unknown 单帧静置。数字按本仓两帧图集与 48px 显示尺寸重推（参照 vscode-pets
+  的"每状态独立 GIF、帧率各不同"这一机制，不照搬其帧率）。
+- **引用的帧必须非空**（`test/atlas-cadence.test.mjs` + `test/png-alpha.mjs`）：零依赖读 PNG alpha，
+  断言①每状态引用的列非空、②非空列必须被引用。起因是 `unknown` 第二格 α=0 而 durations 走了两帧 ⇒
+  宠物在"判不了"状态下**每 1.94 秒消失 140ms**。读像素用自带的 Node 解码器，不依赖本机装了哪个 venv。
+- **动效属性归属表**（`persona.css` 顶部注释 + `test/persona-css.test.mjs`）：pop 只动 `scale/opacity`，
+  状态动效只动 `translate/rotate`，朝向只动 `transform`。旧写法里 `[data-state] .av-sprite` 的
+  `animation` 把 `.av-sprite` 的 pop **整条覆盖**（4 个状态从来没有过渡动画），现在每个状态规则都必须
+  带 `var(--av-pop)`，且由测试机械咬住。
+- **朝向**：拖拽时按水平位移方向写 `--av-face:-1`，`.av-sprite { transform: scaleX(var(--av-face,1)) }`
+  （照 vscode-pets 的 faceLeft/faceRight；带 6px 死区，手抖不翻身）。
 - **闸门只管一次性动作，不改事实**（`src/pet-gates.mjs`）：
   `admitsAlert` 要求"这次失败站够久"（默认 2 分钟；拿不到时长则要求连续两条）才配弹
   ——单次采样不足以下结论；`createReactionGate` 让相邻反应有间隔、同一动作有冷却。

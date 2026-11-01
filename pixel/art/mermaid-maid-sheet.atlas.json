@@ -12,42 +12,41 @@
    "row": 0,
    "durations": [
     1800,
-    140
+    130
    ]
   },
   "busy": {
    "row": 1,
    "durations": [
-    1800,
-    140
+    520,
+    280
    ]
   },
   "alert": {
    "row": 2,
    "durations": [
-    1800,
-    140
+    700,
+    220
    ]
   },
   "sleep": {
    "row": 3,
    "durations": [
-    1800,
-    140
+    2600,
+    400
    ]
   },
   "happy": {
    "row": 4,
    "durations": [
-    1800,
-    140
+    420,
+    200
    ]
   },
   "unknown": {
    "row": 5,
    "durations": [
-    1800,
-    140
+    1500
    ]
   }
  },

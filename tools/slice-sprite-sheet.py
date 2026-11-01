@@ -204,6 +204,7 @@ def main(argv):
         print(__doc__, file=sys.stderr); return 2
     src, prefix = argv[1], argv[2]
     cell, rows, cols, right_cut, colors, mode = 48, 6, 2, None, 24, 'gaps'
+    cadence_arg = None
     sampler = 'majority'
     i = 3
     while i < len(argv):
@@ -214,6 +215,7 @@ def main(argv):
         elif k == '--right-cut': right_cut = int(argv[i + 1]); i += 2
         elif k == '--colors': colors = int(argv[i + 1]); i += 2
         elif k == '--grid': mode = argv[i + 1]; i += 2
+        elif k == '--cadence': cadence_arg = argv[i + 1]; i += 2
         elif k == '--sampler': sampler = argv[i + 1]; i += 2
         else: print('未知参数 ' + k, file=sys.stderr); return 2
 
@@ -223,6 +225,17 @@ def main(argv):
         mask_img.paste(0, (right_cut, 0, im.width, im.height))
     mnp = np.asarray(mask_img) > 128
     boxes = components(mnp)
+
+    import json as _json
+    here = os.path.dirname(os.path.abspath(__file__))
+    cand = [cadence_arg,
+            os.path.join(os.path.dirname(os.path.abspath(prefix)), 'pet-cadence.json'),
+            os.path.join(here, '..', 'pixel', 'art', 'pet-cadence.json')]
+    cadence_path = next((c for c in cand if c and os.path.exists(c)), None)
+    if not cadence_path:
+        print('缺 pet-cadence.json（每状态帧节奏的唯一真源）', file=sys.stderr); return 1
+    with open(cadence_path, encoding='utf-8') as f:
+        cadence = _json.load(f)
 
     grid, err, band_h = compute_grid(mode, mnp, boxes, rows, cols, right_cut)
     if err or not grid:
@@ -290,11 +303,28 @@ def main(argv):
     atl_path = prefix + '.atlas.png'
     atlas.save(atl_path, optimize=True)
     atlas.save(prefix + '.atlas.webp', 'WEBP', lossless=True)
+    # 节奏的真源是 pixel/art/pet-cadence.json（JS 侧门禁也读它）——不要在这里硬编码帧长。
+    states_meta = {}
+    for idx, name in enumerate(STATES[:rows]):
+        dur = cadence.get(name, {}).get('durations')
+        if not dur:
+            raise SystemExit('cadence 缺 %s 的 durations（%s）' % (name, cadence_path))
+        if len(dur) > cols:
+            raise SystemExit('%s 的 durations 有 %d 项，但每行只有 %d 列' % (name, len(dur), cols))
+        # 只引用非空列：空列绝不能进 durations，否则播放器会在一段时间里画出一格空白
+        # （实测：unknown 行第二格 α=0，旧 durations [1800,140] ⇒ 每 1.94s 消失 140ms）
+        empty = [c for c in range(len(dur))
+                 if not atlas.crop((c * cell, idx * cell, (c + 1) * cell, (idx + 1) * cell))
+                 .getchannel('A').getbbox()]
+        if empty:
+            raise SystemExit('%s 引用了空列 %s（α 全 0）⇒ 会闪。请在 cadence 里去掉这些帧，或补素材'
+                             % (name, empty))
+        states_meta[name] = {'row': idx, 'durations': dur}
+
     meta = {
         'cell': [cell, cell],
         'atlas': [cell * cols, cell * rows],
-        'states': {n: {'row': idx, 'durations': [1800, 140] if cols > 1 else [1800]}
-                   for idx, n in enumerate(STATES[:rows])},
+        'states': states_meta,
         'source': os.path.basename(src),
         'gridMode': mode,
         'slicedCells': len(grid),

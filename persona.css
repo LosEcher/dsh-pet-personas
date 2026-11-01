@@ -55,15 +55,30 @@
 
 /* 状态切换的过渡：**换行时给一个 90ms 的小弹跳**，避免"硬切"。
    用 React 的 key 变化触发重放（组件重挂载 → 动画重跑），不靠 JS 计时器。 */
+/* ⚠️ 属性归属表（**别越界**，越界就会互相覆盖）：
+     · pop（换状态）    → 只用 `scale` + `opacity`
+     · 状态动效（停留） → 只用 `translate` + `rotate`
+     · 朝向（拖拽）     → 只用 `transform: scaleX()`
+   CSS 的 `transform` 是一个属性，两个动画同时写它 = 后声明的赢（2026-11-01 实测：`[data-state]`
+   规则把 `.av-sprite` 的 pop 整个盖掉了，4 个状态因此从来没有过渡动画）。分开写不同属性即可共存，
+   不需要多套 DOM。 */
 @keyframes av-sprite-pop {
-  0%   { transform: scale(0.92) translateY(1px); opacity: .55 }
-  60%  { transform: scale(1.03) translateY(-1px); opacity: 1 }
-  100% { transform: scale(1) translateY(0); }
+  0%   { scale: 0.92; opacity: .55 }
+  60%  { scale: 1.03; opacity: 1 }
+  100% { scale: 1; }
 }
-.av-sprite { animation: av-sprite-pop 160ms ease-out; }
+
+/* 弹跳要**和状态动效一起挂**：`animation` 是单属性，状态规则里不带上它就会把 pop 弄丢。
+   用变量只写一次名字，状态规则 `animation: var(--av-pop), <状态动效>`。 */
+.av-sprite {
+  --av-pop: av-sprite-pop 160ms ease-out;
+  animation: var(--av-pop);
+  /* 朝向：拖拽时由 JS 写 --av-face:-1（参照 vscode-pets 的 faceLeft/faceRight，用 scaleX 翻转） */
+  transform: scaleX(var(--av-face, 1));
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .av-sprite { animation: none !important; }
+  .av-sprite { animation: none !important; transform: none; }
 }
 
 /* ── 状态动效（2026-11-01 第三批）───────────────────────────────
@@ -71,44 +86,46 @@
    `.av-sprite` 的 pop（见文件前段）承担"过渡"，这里负责"停留时的呼吸感"。
    全部在 prefers-reduced-motion 下关闭（状态换行照旧，不因省动效而失真）。 */
 
-/* 睡眠：慢呼吸（振幅小、周期长——不能看起来像在发抖） */
+/* 睡眠：慢呼吸（用 translate 而不是 scale——scale 归 pop 独占） */
 @keyframes av-breathe {
-  0%, 100% { transform: scale(1) translateY(0) }
-  50%      { transform: scale(1.035) translateY(-1px) }
+  0%, 100% { translate: 0 0 }
+  50%      { translate: 0 -1px }
 }
 
 /* alert：短促左右轻抖（提示"有事"，不是持续摇头） */
 @keyframes av-alert-shake {
-  0%, 100% { transform: translateX(0) }
-  25%      { transform: translateX(-1px) rotate(-2deg) }
-  75%      { transform: translateX(1px) rotate(2deg) }
+  0%, 100% { translate: 0 0; rotate: 0deg }
+  25%      { translate: -1px 0; rotate: -2deg }
+  75%      { translate: 1px 0; rotate: 2deg }
 }
 
 /* happy：一次小跳 */
 @keyframes av-happy-hop {
-  0%   { transform: translateY(0) }
-  35%  { transform: translateY(-3px) }
-  70%  { transform: translateY(0) }
-  85%  { transform: translateY(-1px) }
-  100% { transform: translateY(0) }
+  0%   { translate: 0 0 }
+  35%  { translate: 0 -3px }
+  70%  { translate: 0 0 }
+  85%  { translate: 0 -1px }
+  100% { translate: 0 0 }
 }
 
 /* busy：轻微点头（周期 2.4s，避免"抽搐"） */
 @keyframes av-busy-nod {
-  0%, 100% { transform: rotate(0deg) }
-  40%      { transform: rotate(-1.2deg) }
-  70%      { transform: rotate(1deg) }
+  0%, 100% { rotate: 0deg }
+  40%      { rotate: -1.2deg }
+  70%      { rotate: 1deg }
 }
 
 .av-sprite { transform-origin: 50% 85%; will-change: transform }
 
-[data-state="sleep"] .av-sprite { animation: av-breathe 3.6s ease-in-out infinite }
-[data-state="alert"] .av-sprite { animation: av-alert-shake .42s ease-in-out 3 }
-[data-state="happy"] .av-sprite { animation: av-happy-hop .62s ease-out 2 }
-[data-state="busy"]  .av-sprite { animation: av-busy-nod 2.4s ease-in-out infinite }
+/* 每个状态都必须**带上 pop**（`--av-pop`），否则换状态就没有过渡（见上面的属性归属表） */
+[data-state="sleep"] .av-sprite { animation: var(--av-pop), av-breathe 3.6s ease-in-out infinite }
+[data-state="alert"] .av-sprite { animation: var(--av-pop), av-alert-shake .42s ease-in-out 3 }
+[data-state="happy"] .av-sprite { animation: var(--av-pop), av-happy-hop .62s ease-out 2 }
+[data-state="busy"]  .av-sprite { animation: var(--av-pop), av-busy-nod 2.4s ease-in-out infinite }
 
-/* 拖动：倾斜 + 微放大，给"被拎起来"的手感（不改位置，位置由 JS 负责） */
-[data-dragging="1"] .av-sprite { animation: none; transform: scale(1.06) rotate(-4deg) }
+/* 拖动：倾斜 + 微放大，给"被拎起来"的手感（不改位置，位置由 JS 负责）。
+   用 scale/rotate 独立属性——`transform` 已归朝向（scaleX），写它会把朝向翻回来。 */
+[data-dragging="1"] .av-sprite { animation: none; scale: 1.06; rotate: -4deg }
 
 /* 气泡：从下往上淡入（160ms，比状态 pop 稍长一点，读起来像"说话"） */
 @keyframes av-bubble-in {
