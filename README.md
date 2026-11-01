@@ -17,7 +17,7 @@ personas/*.svg          12 个形象，每个 120×120，含 happy/worry/confuse
 personas/index.json     形象包注册表（label / parts / motion / voice / ipNote）
 persona.css             demo 用样式（浮层里有自己的等价样式）
 demo.html               本地 demo：4~12 形象 × 三维 × 交互
-test/*.test.mjs         65 用例（映射/结构/注册表 + 播放器状态图守卫 state-graph）
+test/*.test.mjs         72 用例（映射/结构/注册表 + 状态图守卫 + 反应/持续闸门）
 preview-*.png           浏览器实测截图
 ```
 
@@ -36,7 +36,7 @@ preview-*.png           浏览器实测截图
 ## 复跑
 
 ```bash
-node --test "test/*.test.mjs"      # 65 pass
+node --test "test/*.test.mjs"      # 72 pass
 python3 -m http.server 8791        # 然后开 http://127.0.0.1:8791/demo.html
 ```
 
@@ -49,5 +49,9 @@ python3 -m http.server 8791        # 然后开 http://127.0.0.1:8791/demo.html
   `test/state-graph.test.mjs` 用纯数据守住四件事：表引用的 state 在图集里、每个 state 都可达、
   每个 opener 都被 close 收、sticky 一定有清空入口。
 - 交互只改表现：hover 抬升、点击气泡、`prefers-reduced-motion` 下无位移。
+- **闸门只管一次性动作，不改事实**（`src/pet-gates.mjs`）：
+  `admitsAlert` 要求"这次失败站够久"（默认 2 分钟；拿不到时长则要求连续两条）才配弹
+  ——单次采样不足以下结论；`createReactionGate` 让相邻反应有间隔、同一动作有冷却。
+  **区间事件（task.start/task.end…）永不过滤**：漏一条 task.end，状态栈就再也弹不回去。
 - 新增形象 = 加一个 `personas/<id>.svg` + `index.json` 一条 + `avatar-state.mjs` 的 `PERSONAS`；
   `index.json` 与 SVG 不一致会让**插件生成期**直接失败（这是刻意的）。
