@@ -34,3 +34,29 @@ test('文案：每个状态都有词，unknown 不吹牛，轮换可用', () => 
   assert.match(lineFor('unknown', 0), /看不清|读不到|判不了/)
   assert.ok(!/正常|没事/.test(lineFor('unknown', 0)))
 })
+
+import { isStale, inNightWindow, STALE_MS } from '../src/status-to-events.mjs'
+
+test('新鲜度：6h 内算新；缺 asOf / 解析不了 ⇒ stale（判不了不是好消息）', () => {
+  const now = Date.parse('2026-11-01T12:00:00Z')
+  assert.equal(isStale('2026-11-01T08:00:00Z', now), false)
+  assert.equal(isStale('2026-11-01T05:59:00Z', now), true)
+  assert.equal(isStale(null, now), true)
+  assert.equal(isStale('不是时间', now), true)
+  assert.equal(isStale('2026-11-01T08:00:00Z', now, 1), true) // 阈值可调
+})
+
+test('新鲜度：未来时间（时钟回拨）不算 stale，避免把一切判死', () => {
+  const now = Date.parse('2026-11-01T12:00:00Z')
+  assert.equal(isStale('2026-11-01T13:00:00Z', now), false)
+})
+
+test('夜间窗口：23–7 跨零点，白天不算', () => {
+  const at = (h) => new Date(2026, 10, 1, h, 30).getTime()
+  assert.equal(inNightWindow(at(23)), true)
+  assert.equal(inNightWindow(at(2)), true)
+  assert.equal(inNightWindow(at(6)), true)
+  assert.equal(inNightWindow(at(7)), false)
+  assert.equal(inNightWindow(at(14)), false)
+  assert.equal(STALE_MS, 6 * 3600_000)
+})

@@ -28,6 +28,37 @@ export function eventsFor(prev, next) {
 }
 
 /**
+ * 数据新鲜度 → 能不能当成"还活着"来画。
+ *
+ * 为什么这算显示不变量而不是口味：pet-status 的 `asOf` 是**源数据的时间**，
+ * 不是拿到它的时间。一个 12 小时前的"世界还好"，画成睁眼的 idle 就是在骗人——
+ * 与网页上"新鲜度渲染成词"（V1）是同一条纪律，只是在挂件上表现为**表情**。
+ *
+ * 判据（不可判也要说清）：
+ *   · asOf 缺失/解析不了 ⇒ 视为 stale（判不了不是好消息）；
+ *   · now - asOf > staleMs ⇒ stale；
+ *   · 未来时间（时钟回拨）⇒ 不算 stale（不能因为时钟错就把一切判死），但夹到 0 差值。
+ */
+export const STALE_MS = 6 * 3600_000
+
+export function isStale(asOf, now, staleMs = STALE_MS) {
+  if (!asOf) return true
+  const t = typeof asOf === 'number' ? asOf : Date.parse(String(asOf))
+  if (!Number.isFinite(t)) return true
+  const age = Math.max(0, now - t)
+  return age > staleMs
+}
+
+/**
+ * 夜间节律：23:00–07:00（本地时区）且没有异常 ⇒ 该睡。
+ * 只在 health 正常时才成立；attention 就是 attention，不能因为到点而"睡过去"。
+ */
+export function inNightWindow(nowMs, { start = 23, end = 7 } = {}) {
+  const hour = new Date(nowMs).getHours()
+  return start > end ? (hour >= start || hour < end) : (hour >= start && hour < end)
+}
+
+/**
  * 久坐检测：没有任何状态变化超过 idleMs ⇒ 困了；有变化 ⇒ 立刻叫醒。
  * 拆成纯函数是为了能单测（时间由调用方注入，不读 Date.now）。
  */
