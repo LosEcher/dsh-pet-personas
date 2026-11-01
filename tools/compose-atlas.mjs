@@ -16,7 +16,8 @@
  * 清单格式（manifest.json）：
  *   { "sleep": { "frames": ["pixel/frames/sleep-z/sleep_z_0.png", "..."], "durations": [850,850,850,850] } }
  */
-import { readFileSync, writeFileSync, existsSync } from 'node:fs'
+import { readFileSync, writeFileSync, existsSync, statSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
 import { dirname, join, resolve } from 'node:path'
 import { deflateSync, crc32 } from 'node:zlib'
 import { readPng, opaqueCount } from './png-alpha.mjs'
@@ -80,7 +81,28 @@ function pasteCell(atlas, atlasWidth, cell, col, row, src) {
   }
 }
 
-export function composeAtlas({ atlasPrefix, manifestPath, dryRun = false }) {
+/**
+ * 由合成后的 PNG 重生成 WebP —— **漏掉这一步会出"人物被裁/比例不对"**（2026-11-01 实际踩到）：
+ * 插件用 data-URI 嵌入的是 WebP，而不是 PNG；只写 PNG 意味着浏览器拿到的还是旧的 2 列图，
+ * 而 meta 已经是 4 列 ⇒ background-size 按 4 列算、图只有 2 列宽 ⇒ 横向拉伸 + 列定位全错。
+ */
+function regenerateWebp(atlasPrefix, pythonBin) {
+  const script = new URL('./atlas-webp.py', import.meta.url).pathname
+  const result = spawnSync(pythonBin, [script, '--atlas', atlasPrefix], { encoding: 'utf8' })
+  if (result.status !== 0) {
+    throw new Error(`生成 WebP 失败（${pythonBin}）：${(result.stderr || result.stdout || '').trim().slice(0, 300)}`)
+  }
+  // 自证：webp 必须比 png 新，且两者都在
+  const pngPath = `${atlasPrefix}.atlas.png`
+  const webpPath = `${atlasPrefix}.atlas.webp`
+  if (!existsSync(webpPath)) throw new Error(`没有生成 ${webpPath}`)
+  if (statSync(webpPath).mtimeMs + 1 < statSync(pngPath).mtimeMs) {
+    throw new Error(`${webpPath} 比 ${pngPath} 旧 —— WebP 没更新，显示会比例错`)
+  }
+  return result.stdout.trim()
+}
+
+export function composeAtlas({ atlasPrefix, manifestPath, dryRun = false, pythonBin = process.env.PET_PYTHON ?? 'python3' }) {
   const metaPath = `${atlasPrefix}.atlas.json`
   const pngPath = `${atlasPrefix}.atlas.png`
   const meta = JSON.parse(readFileSync(metaPath, 'utf8'))
@@ -159,6 +181,7 @@ export function composeAtlas({ atlasPrefix, manifestPath, dryRun = false }) {
   if (!dryRun) {
     writeRgbaPng(pngPath, width, height, atlas)
     writeFileSync(metaPath, JSON.stringify(outMeta, null, 1) + '\n')
+    outMeta.webp = regenerateWebp(atlasPrefix, pythonBin)
   }
   return { ok: true, problems, meta: outMeta, cols, width, height }
 }
