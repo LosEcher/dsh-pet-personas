@@ -114,3 +114,22 @@ npm run atlas:all              按清单重切全部（需要 Pillow+numpy 的 p
 
 测试预算随之调整：`test/atlas.test.mjs` 的体积上限 16KB → **40KB**（为 Retina 付的钱，
 注释里写了原因，避免后人"优化"回去）。
+
+## 9. 状态接线 / 过渡 / 文案（2026-11-01 第二轮）
+
+之前只有 idle/busy/alert 三个状态在用，atlas 里的 `sleep` / `happy` 两行是**切好了但没接线**。
+这轮补齐：
+
+| 项 | 现在的行为 | 判据 |
+|---|---|---|
+| **sleep** | 90 秒没有任何状态变化 ⇒ 压一层 `sleep` 区间；任何状态变化立刻 `idle.wake` 叫醒 | `idleEvent()` 单测 4 条（含"继续不动不重复触发"） |
+| **happy** | `busy→idle`（干完一件活）与 `attention→ok`（恢复了）各放一次 `happy` oneshot，放完回落 | `eventsFor()` 单测（含"attention 期间变闲不放 happy"的负向控制） |
+| **过渡** | 状态切换时 `av-sprite-pop` 160ms 小弹跳（scale 0.92→1.03→1）；靠 React `key` 变化重放，不靠计时器 | 浏览器实测 `animation: 0.16s ease-out av-sprite-pop` |
+| **reduced-motion** | 弹跳与逐帧推进都关掉，但**状态换行照旧**（不会因为省动效就变成一直 idle） | CSS `@media` + hook 里不启动计时器 |
+| **文案** | `pet-voice.mjs`：每状态 3 句轮换；`unknown` 只能说"看不清/读不到/判不了"；hover 时显示宠物口吻，静止显示服务端事实文本 | 单测断言 unknown 不含"正常/没事"，且轮换生效 |
+
+**为什么 happy 不能每次轮询都放**：pet-status 每 30s 轮询一次，如果"idle 就 happy"那就是一直抽搐。
+只在**跳变**触发，且 `attention→idle` 不放（那是"出过事又闲了"，不是干完了）。
+
+**文案与事实分家**：气泡的"事实"（几个会话在跑、源是什么时间）始终来自 `display.text`；
+`pet-voice` 只负责语气。两处都不许编数字——否则同一件事在两个地方对不上。

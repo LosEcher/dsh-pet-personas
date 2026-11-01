@@ -21,6 +21,8 @@ export const DEFAULT_TABLES = {
     'session.start': 'busy',
     'tool.start': 'busy',
     'task.start': 'busy',
+    // 长时间没动静 ⇒ 压一层 sleep 区间（收摊时会被 idle.wake 收掉）
+    'idle.sleep': 'sleep',
   },
   /**
    * 事件 → 它要关掉**哪些 opener 开的**区间（对照 opener 事件名，不是状态名）。
@@ -32,12 +34,16 @@ export const DEFAULT_TABLES = {
     'session.end': ['session.start', 'tool.start', 'task.start'],
     'tool.end': ['tool.start'],
     'task.end': ['task.start'],
+    // 任何活动都先叫醒：sleep 是"最软"的一层，醒了就退回去
+    'idle.wake': ['idle.sleep', 'task.start', 'tool.start', 'session.start'],
   },
   /** 事件 → 放一次就回落的瞬时动作 */
   oneshot: {
     'gate.fail': 'alert',
     'tool.error': 'alert',
     'attention.raise': 'alert',
+    // 干完一件活：放一次 happy（帧来自 atlas 的 happy 行），放完回落
+    'task.done': 'happy',
   },
 }
 

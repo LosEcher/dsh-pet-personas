@@ -52,3 +52,16 @@
   .av, .av * { animation: none !important; transition: none !important; }
   .av.av-hover { transform: none; }
 }
+
+/* 状态切换的过渡：**换行时给一个 90ms 的小弹跳**，避免"硬切"。
+   用 React 的 key 变化触发重放（组件重挂载 → 动画重跑），不靠 JS 计时器。 */
+@keyframes av-sprite-pop {
+  0%   { transform: scale(0.92) translateY(1px); opacity: .55 }
+  60%  { transform: scale(1.03) translateY(-1px); opacity: 1 }
+  100% { transform: scale(1) translateY(0); }
+}
+.av-sprite { animation: av-sprite-pop 160ms ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .av-sprite { animation: none !important; }
+}
