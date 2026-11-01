@@ -85,18 +85,27 @@ export function savePrefs(storage, prefs) {
 /**
  * 拖动后的位置：存成"相对某角的偏移"，这样窗口尺寸变化时不会飞到屏幕外。
  * 返回**落点坐标**（左上角），调用方直接用作 style.left/top。
+ *
+ * ⚠️ `size` 是**精灵**的边长，`width/height` 才是挂件**实际占位**（sprite + 文字药丸的整块）。
+ * 只按 `size` 贴角会漏算标签宽度 ⇒ 2026-11-01 实测：默认 br 角落右缘 1529 / 视口 1400，
+ * 可见文字（设计里认定的主信号）被切掉 129px。两者缺省都与 size 相同，旧调用方语义不变。
  */
-export function resolvePosition({ corner, offset, viewport, size, margin = 16 }) {
+export function resolvePosition({ corner, offset, viewport, size, width, height, margin = 16 }) {
   const { w, h } = viewport
+  const bw = Math.max(0, Number(width) || size)
+  const bh = Math.max(0, Number(height) || size)
+  // 窗口比挂件还窄时贴 0：宁可压住左边，也不能算出负坐标（负值等于"不定位"）
+  const maxX = Math.max(0, w - bw - margin)
+  const maxY = Math.max(0, h - bh - margin)
   const base = {
     tl: { x: margin, y: margin },
-    tr: { x: w - size - margin, y: margin },
-    bl: { x: margin, y: h - size - margin },
-    br: { x: w - size - margin, y: h - size - margin },
-  }[corner] ?? { x: w - size - margin, y: h - size - margin }
+    tr: { x: maxX, y: margin },
+    bl: { x: margin, y: maxY },
+    br: { x: maxX, y: maxY },
+  }[corner] ?? { x: maxX, y: maxY }
   if (!offset) return { x: Math.max(0, base.x), y: Math.max(0, base.y) }
   return {
-    x: Math.min(Math.max(0, base.x + offset.x), Math.max(0, w - size)),
-    y: Math.min(Math.max(0, base.y + offset.y), Math.max(0, h - size)),
+    x: Math.min(Math.max(0, base.x + offset.x), Math.max(0, w - bw)),
+    y: Math.min(Math.max(0, base.y + offset.y), Math.max(0, h - bh)),
   }
 }

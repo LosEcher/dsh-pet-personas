@@ -55,6 +55,23 @@ test('位置：四角基准 + offset；越界被夹回视口内', () => {
   assert.ok(out.x <= viewport.w - 48 && out.y >= 0, JSON.stringify(out))
 })
 
+test('位置按**实际占位宽**贴角（回归：只按精灵 48 贴角会把标签探出视口）', () => {
+  const viewport = { w: 1400, h: 900 }
+  // 负向控制：旧算法（只传 size）在实测那台机器上确实会溢出 —— 右缘 1529 > 1400
+  const legacy = resolvePosition({ corner: 'br', offset: null, viewport, size: 48 })
+  assert.ok(legacy.x + 193 > viewport.w, `负向控制失效：${legacy.x + 193}`)
+  // 传实际占位后：右缘/下缘恰好留一个 margin，整块在视口内
+  const fixed = resolvePosition({ corner: 'br', offset: null, viewport, size: 48, width: 193, height: 58 })
+  assert.equal(fixed.x + 193, viewport.w - 16)
+  assert.equal(fixed.y + 58, viewport.h - 16)
+  // 窗口比挂件还窄 ⇒ 贴 0，不出现负坐标
+  const tiny = resolvePosition({ corner: 'br', offset: null, viewport: { w: 120, h: 60 }, size: 48, width: 193, height: 58 })
+  assert.ok(tiny.x >= 0 && tiny.y >= 0, JSON.stringify(tiny))
+  // 拖动越界同样按实际占位夹住（不是按 size）
+  const dragged = resolvePosition({ corner: 'br', offset: { x: 9999, y: 9999 }, viewport, size: 48, width: 193, height: 58 })
+  assert.ok(dragged.x <= viewport.w - 193 && dragged.y <= viewport.h - 58, JSON.stringify(dragged))
+})
+
 test('手势：短按不动=click；动 4px=拖；按住超 220ms 不动=press', () => {
   const from = { x: 100, y: 100 }
   assert.equal(classifyGesture({ from, to: from, durationMs: 50 }), 'click')
