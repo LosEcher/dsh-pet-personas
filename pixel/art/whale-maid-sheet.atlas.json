@@ -1,11 +1,11 @@
 {
  "cell": [
-  48,
-  48
+  96,
+  96
  ],
  "atlas": [
-  96,
-  288
+  192,
+  576
  ],
  "states": {
   "idle": {
@@ -52,5 +52,6 @@
   }
  },
  "source": "Pixel Whale Maid Sprite Sheet.png",
+ "gridMode": "content",
  "slicedCells": 11
 }

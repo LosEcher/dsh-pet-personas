@@ -23,7 +23,10 @@ for (const stem of SHEETS) {
     const buf = readFileSync(w)
     assert.equal(buf.subarray(0, 4).toString('ascii'), 'RIFF')
     assert.equal(buf.subarray(8, 12).toString('ascii'), 'WEBP')
-    assert.ok(buf.length < 16 * 1024, `${stem} webp ${buf.length}B 超 16KB 预算`)
+    // 预算随 cell 走：48px 时代 ≤16KB 够用；改成 **96px（Retina 1:1）** 后无损 WebP 实测 29–34KB，
+    // 这是为"清楚"付的钱（同一素材 48px 上屏会被放大成 2× 糊块，见 DESIGN-VI §8）。
+    const budget = 40 * 1024
+    assert.ok(buf.length < budget, `${stem} webp ${buf.length}B 超 ${budget / 1024}KB 预算`)
   })
 }
 

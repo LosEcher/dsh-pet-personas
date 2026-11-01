@@ -1,0 +1,22 @@
+{
+ "$comment": "每个 persona 的切图参数：同一份脚本、不同 sheet 需要不同 --grid。改这里再跑 npm run atlas:all。",
+ "cell": 96,
+ "colors": 32,
+ "sampler": "majority",
+ "sources": [
+  {
+   "id": "mermaid-maid",
+   "src": "ref/Blue-Haired Mermaid Maid Sprite Sheet.png",
+   "out": "pixel/art/mermaid-maid-sheet",
+   "grid": "gaps",
+   "rightCut": null
+  },
+  {
+   "id": "whale-maid",
+   "src": "ref/Pixel Whale Maid Sprite Sheet.png",
+   "out": "pixel/art/whale-maid-sheet",
+   "grid": "content",
+   "rightCut": 800
+  }
+ ]
+}

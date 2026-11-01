@@ -161,6 +161,39 @@ def compute_grid(mode, mnp, boxes, rows, cols, right_cut):
     return grid, None, None
 
 
+def resample(crop, cell, sampler):
+    """把源格子缩到 cell×cell。三种采样的观感差别很大（实测）：
+
+    · area（LANCZOS 平均）：把源图 4~5 个像素平均成一个 ⇒ 颜色被"调和"，边缘出现灰过渡，
+      48px 下看起来是**糊的**。AI 出的"像素风"素材本来就是软边，平均之后更糊。
+    · majority（块内众数）：源块里出现次数最多的**不透明**颜色胜出 ⇒ 每个目标像素都是纯色，
+      边缘硬、色块干净，这才是像素画该有的样子。
+    · nearest：取块中心像素，最快，但遇到细线会抖。
+
+    默认 majority（2026-11-01 实测：同素材 48px 下明显比 area 清楚）。
+    """
+    if sampler == 'area':
+        return crop.resize((cell, cell), Image.LANCZOS)
+    if sampler == 'nearest':
+        return crop.resize((cell, cell), Image.NEAREST)
+    src = np.asarray(crop)
+    h, w = src.shape[:2]
+    out = np.zeros((cell, cell, 4), dtype=np.uint8)
+    for y in range(cell):
+        for x in range(cell):
+            y0, y1 = int(y * h / cell), max(int(y * h / cell) + 1, int((y + 1) * h / cell))
+            x0, x1 = int(x * w / cell), max(int(x * w / cell) + 1, int((x + 1) * w / cell))
+            block = src[y0:y1, x0:x1].reshape(-1, 4)
+            opaque = block[block[:, 3] >= 110]
+            if len(opaque) * 2 < block.shape[0]:
+                continue  # 这格以透明为主 ⇒ 目标像素透明
+            keys = opaque[:, :3]
+            uniq, counts = np.unique(keys, axis=0, return_counts=True)
+            rgb = uniq[counts.argmax()]
+            out[y, x] = (rgb[0], rgb[1], rgb[2], 255)
+    return Image.fromarray(out, 'RGBA')
+
+
 def warm_count(arr):
     r, g, b, al = arr[:, :, 0], arr[:, :, 1], arr[:, :, 2], arr[:, :, 3]
     return int(((al > 128) & (r > g + 30) & (r > b + 30)).sum())
@@ -171,6 +204,7 @@ def main(argv):
         print(__doc__, file=sys.stderr); return 2
     src, prefix = argv[1], argv[2]
     cell, rows, cols, right_cut, colors, mode = 48, 6, 2, None, 24, 'gaps'
+    sampler = 'majority'
     i = 3
     while i < len(argv):
         k = argv[i]
@@ -180,6 +214,7 @@ def main(argv):
         elif k == '--right-cut': right_cut = int(argv[i + 1]); i += 2
         elif k == '--colors': colors = int(argv[i + 1]); i += 2
         elif k == '--grid': mode = argv[i + 1]; i += 2
+        elif k == '--sampler': sampler = argv[i + 1]; i += 2
         else: print('未知参数 ' + k, file=sys.stderr); return 2
 
     im = Image.open(src).convert('RGBA')
@@ -227,7 +262,7 @@ def main(argv):
                 m.paste(255, (ax0 - left, ay0 - top, ax1 - left, ay1 - top))
             a_old = crop.split()[3]
             crop.putalpha(Image.composite(a_old, Image.new('L', (side, side), 0), m))
-        small = crop.resize((cell, cell), Image.LANCZOS)
+        small = resample(crop, cell, sampler)
         a2 = small.split()[3].point(lambda v: 255 if v >= 110 else 0)
         if colors:
             # **必须 MAXCOVERAGE**：MEDIANCUT 会把"小而饱和"的装饰色（alert 行的橙红感叹号）
