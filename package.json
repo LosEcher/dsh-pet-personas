@@ -7,7 +7,9 @@
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "demo": "python3 -m http.server 8791",
-    "gen": "node ../dsplugins/dsh-os-seams/scripts/gen-persona-assets.mjs"
+    "gen": "node ../dsplugins/dsh-os-seams/scripts/gen-persona-assets.mjs",
+    "refs:scan": "python3 tools/refs-scan.py ref/ > refs.manifest.json",
+    "art:vector": "python3 tools/png2svg.py pixel/art/whale-maid.48.png pixel/art/whale-maid.vector.svg --quantize 14 && python3 tools/png2svg.py pixel/art/claude-maid.48.png pixel/art/claude-maid.vector.svg --quantize 14"
   },
   "license": "MIT"
 }
