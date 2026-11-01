@@ -1,0 +1,36 @@
+# pixel/candidates — AI/外部生成的**候选帧**（不是素材，未进图集）
+
+任何候选帧必须先过 `tools/frame-gate.mjs`，才**有资格**被讨论要不要进图集；目前这里的图都只是证据。
+
+## 2026-11-01 首批（M3 · ComfyUI · Qwen-Image-2.1 GGUF edit）
+
+| 文件 | 来源参数 | changed | identity(8×8 色距) | 结论 |
+|---|---|---|---|---|
+| `idle_closed_b.png` | denoise 0.78, seed 7, 10 steps, 0.2MP | 0.827 | **0.0548** | 眼睛确实闭上了，落在"同角色相邻帧"实测区间（0.0507–0.1368）内 |
+| `idle_closed_a.png` | denoise 0.5, seed 1 | 0.817 | 0.0350 | **没改动**（低于所有手绘帧的帧间波动）⇒ 白跑 |
+
+生成命令（M3 上，`scripts/m3-pet-frame.py` 由本仓 `tools/m3-pet-frame.py` 同步过去）：
+
+```bash
+python3 scripts/m3-pet-frame.py --ref pet_idle_col0.png \
+  --prompt "redraw this chibi girl with her eyes fully CLOSED ... same hair, outfit, colors, pixel art" \
+  --prefix pet/idle_closed_b --denoise 0.78 --megapixels 0.2 --steps 10 --seed 7
+# 收口（M1 本地）
+python3 tools/frame-intake.py --base <col0.png> --cand <生成图.png> --out pixel/candidates/x.png
+node tools/frame-gate.mjs --base <col0.png> --cand pixel/candidates/x.png
+```
+
+## 判据是怎么来的（不是拍的）
+
+先把**现有手绘素材自己量了一遍**（两套 atlas、每套 5 对相邻帧）：
+
+- 覆盖率相对差 0.003–0.167 · 质心位移 0.50–5.04px · 掩膜差分 0.038–0.348
+- 每格色数**恒为 32**，但并集 332 ⇒ **每格各自量化**，不存在全局调色板
+- 同角色相邻帧的 8×8 网格色距 **0.0507–0.1368**
+
+据此改掉了两条一开始想当然的规则：①"候选色板与基准重合 ≥95%"（实测相邻手绘帧只有 13–20%，会误杀自家素材）→ 改成"每格 ≤32 色 + alpha 二值"；②"四周留 1px 透明边"（手绘素材本来就贴边）→ 删掉。
+
+## 还没过的关
+
+- **线条锐利度没有判据**：肉眼可见候选帧的轮廓被"抹圆"了（像素风该是整块颜色 + 1px 硬边），而现有门禁只管结构（尺寸/色数/透明/身份）。要不要再加一条"边缘梯度分布"判据，等定了画法再说。
+- **`frame-intake` 的 alpha 取自基准帧**：这保证了轮廓不变，但也意味着"模型改轮廓"这条路被主动放弃（有意的取舍）。

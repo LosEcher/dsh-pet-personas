@@ -13,7 +13,7 @@ import assert from 'node:assert/strict'
 import { readFileSync, readdirSync, existsSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { readPng, opaqueCount } from './png-alpha.mjs'
+import { readPng, opaqueCount } from '../tools/png-alpha.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const artDir = join(root, 'pixel', 'art')
